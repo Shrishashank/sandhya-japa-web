@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sandhya Japa Counter</title>
+<meta name="description" content="Daily sandhya and japa schedule, 108-bead counter, Rudram learning and progress.">
+<meta name="theme-color" content="#FBF4EA" id="meta-theme">
+<script>
+/* Apply the saved colour theme before the page draws, so it never flashes the wrong colours. */
+(function(){
+  var c = {}; try{ c = (JSON.parse(localStorage.getItem("sandhya-japa-v1")) || {}).cfg || {}; }catch(e){}
+  var r = document.documentElement, mode = c.mode || "auto";
+  r.dataset.palette = c.palette || "ushas";
+  var dark = mode === "dark" || (mode === "auto" && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+  if(dark) r.setAttribute("data-dark",""); else r.removeAttribute("data-dark");
+})();
+</script>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sandhya Japa">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+/* Sandhya Japa theme. Four palettes (data-palette), each with a light and a dark version (data-dark).
+   Token names: --sky page, --paper cards, --ink text, --kumkum accent, --haldi gold/progress, --done completed. */
+:root,:root[data-palette="ushas"]{
+  --sky:#FBF4EA; --paper:#FFFCF7; --ink:#3B2116; --muted:#7A6152; --line:#EBDCCB;
+  --kumkum:#C8402A; --haldi:#D4901A; --done:#2E7D52; --on-accent:#FFFFFF;
+  --hero-a:#FBD38D; --hero-b:#F08A4B; --hero-c:#B23A48; --hero-ink:#FFF9F0; --glow:rgba(200,64,42,.32);
+  color-scheme:light;
+}
+:root[data-palette="ushas"][data-dark]{
+  --sky:#17100E; --paper:#221815; --ink:#F7EADF; --muted:#C2AA9A; --line:#3A2A23;
+  --kumkum:#FF7B54; --haldi:#F4B740; --done:#5FCB93; --on-accent:#1E0E08;
+  --hero-a:#8A4320; --hero-b:#5E2238; --hero-c:#22163A; --hero-ink:#FFEFE0; --glow:rgba(255,123,84,.28);
+  color-scheme:dark;
+}
+:root[data-palette="sandhya"]{
+  --sky:#EEF0F9; --paper:#FFFFFF; --ink:#1B1E43; --muted:#5E6390; --line:#DADDF0;
+  --kumkum:#D2532B; --haldi:#C98A0C; --done:#2C7A58; --on-accent:#FFFFFF;
+  --hero-a:#F6A96B; --hero-b:#9B4F96; --hero-c:#2E2F72; --hero-ink:#FFF7F0; --glow:rgba(210,83,43,.3);
+  color-scheme:light;
+}
+:root[data-palette="sandhya"][data-dark]{
+  --sky:#0D0F24; --paper:#171A3A; --ink:#ECEBFA; --muted:#A3A8D2; --line:#2B2F5C;
+  --kumkum:#FF8A5C; --haldi:#F3BC4C; --done:#5FCB9B; --on-accent:#1A0B08;
+  --hero-a:#6B3375; --hero-b:#33307A; --hero-c:#121433; --hero-ink:#F4F0FF; --glow:rgba(255,138,92,.28);
+  color-scheme:dark;
+}
+:root[data-palette="tulsi"]{
+  --sky:#F0F5EC; --paper:#FCFEF9; --ink:#1D2E22; --muted:#5B7062; --line:#D5E3D0;
+  --kumkum:#B8452A; --haldi:#B98512; --done:#2B7A55; --on-accent:#FFFFFF;
+  --hero-a:#D5E8A8; --hero-b:#5FA06F; --hero-c:#1F5B47; --hero-ink:#F6FFF4; --glow:rgba(184,69,42,.28);
+  color-scheme:light;
+}
+:root[data-palette="tulsi"][data-dark]{
+  --sky:#0E1611; --paper:#16211A; --ink:#E7F2E6; --muted:#A4BBA9; --line:#26372B;
+  --kumkum:#FF8A65; --haldi:#E8B84A; --done:#6AD39F; --on-accent:#1A0B08;
+  --hero-a:#3D6B40; --hero-b:#1F4A3A; --hero-c:#0F1F1F; --hero-ink:#EFFFF2; --glow:rgba(255,138,101,.26);
+  color-scheme:dark;
+}
+:root[data-palette="kamala"]{
+  --sky:#FCF1F4; --paper:#FFFBFC; --ink:#3A1530; --muted:#7C566C; --line:#F1D8E1;
+  --kumkum:#C2366B; --haldi:#CF9420; --done:#2E7D55; --on-accent:#FFFFFF;
+  --hero-a:#FFD1C2; --hero-b:#E2779F; --hero-c:#7E2A62; --hero-ink:#FFF6FA; --glow:rgba(194,54,107,.3);
+  color-scheme:light;
+}
+:root[data-palette="kamala"][data-dark]{
+  --sky:#180D15; --paper:#23131F; --ink:#F8E8F1; --muted:#C7A5B8; --line:#3C2333;
+  --kumkum:#FF79A8; --haldi:#F2BE55; --done:#62CB95; --on-accent:#22081A;
+  --hero-a:#7A2E5F; --hero-b:#4A2150; --hero-c:#1E1230; --hero-ink:#FFF0F7; --glow:rgba(255,121,168,.26);
+  color-scheme:dark;
+}
+:root{
+  --display:"Tiro Devanagari Sanskrit","Noto Serif Devanagari",Georgia,"Times New Roman",serif;
+  --body:"Anek Latin","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+  --r:20px;
+  --shadow:0 1px 2px rgba(40,20,10,.05),0 10px 28px -16px rgba(40,20,10,.22);
+  --safe-t:max(env(safe-area-inset-top,0px),var(--safe-area-inset-top,0px));
+  --safe-b:max(env(safe-area-inset-bottom,0px),var(--safe-area-inset-bottom,0px));
+}
+:root[data-dark]{--shadow:0 1px 2px rgba(0,0,0,.3),0 12px 30px -16px rgba(0,0,0,.6)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%;
+  background:var(--sky);
+  background-image:radial-gradient(120% 60% at 50% -10%,color-mix(in srgb,var(--hero-a) 28%,transparent),transparent 70%),
+    radial-gradient(color-mix(in srgb,var(--haldi) 14%,transparent) 1px,transparent 1.6px);
+  background-size:100% 100%,24px 24px;background-attachment:fixed;
+  padding-top:var(--safe-t);padding-bottom:calc(104px + var(--safe-b));
+  padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:3px solid var(--kumkum);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance}
+.wrap{max-width:620px;margin:0 auto;padding:0 16px}
+.num{font-variant-numeric:tabular-nums}
+
+/* header */
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0 8px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .om{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:22px;line-height:1;
+  color:var(--hero-ink);background:linear-gradient(145deg,var(--hero-a),var(--hero-b) 55%,var(--hero-c));box-shadow:0 6px 16px -6px var(--glow)}
+header.top h1{font-size:24px;line-height:1.05}
+.brand small{display:block;font-size:12.5px;color:var(--muted);font-family:var(--body)}
+.sync{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block}
+.sync[data-s="synced"] i{background:var(--done)}
+.sync[data-s="saving"] i{background:var(--haldi)}
+.sync[data-s="error"] i{background:var(--kumkum)}
+
+/* date bar */
+.datebar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 14px}
+.datebar .d{text-align:center;flex:1}
+.datebar .d b{display:block;font-family:var(--display);font-weight:400;font-size:21px}
+.datebar .d span{font-size:13px;color:var(--muted)}
+.ibtn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--paper);font-size:20px;line-height:1;box-shadow:var(--shadow)}
+.ibtn:disabled{opacity:.35;cursor:default;box-shadow:none}
+.link{background:none;border:0;padding:0;color:var(--kumkum);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+
+.card{background:var(--paper);border:1px solid color-mix(in srgb,var(--line) 70%,transparent);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
+.stack{display:flex;flex-direction:column;gap:16px}
+.eyebrow{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.eyebrow::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--haldi);margin-right:8px;vertical-align:2px}
+
+/* hero (Today): the day's sky */
+.hero{position:relative;overflow:hidden;border:0;color:var(--hero-ink);
+  background:linear-gradient(165deg,var(--hero-a) 0%,var(--hero-b) 55%,var(--hero-c) 100%);
+  box-shadow:0 18px 40px -22px var(--glow);
+  --line:rgba(255,255,255,.42);--ink:var(--hero-ink);--muted:color-mix(in srgb,var(--hero-ink) 80%,transparent);--paper:rgba(255,255,255,.2)}
+.hero::after{content:"ॐ";position:absolute;right:-8px;top:-34px;font-family:var(--display);font-size:150px;line-height:1;opacity:.1;pointer-events:none}
+.hero .eyebrow{color:var(--hero-ink);opacity:.9}
+.hero .eyebrow::before{background:var(--hero-ink)}
+.hero .bar{background:rgba(255,255,255,.3)}
+.hero .bar b{background:var(--hero-ink)}
+.hero .daysum{color:var(--hero-ink)}
+.greet{font-family:var(--display);font-size:22px;margin:4px 0 0}
+
+/* sky arc */
+.arc svg{display:block;width:100%;height:auto}
+.arc text{font-family:var(--body);fill:var(--ink)}
+.arc .t-s{font-size:11px;fill:var(--muted)}
+.arc .t-b{font-size:14px;font-weight:600}
+.daysum{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:6px;font-size:14px;color:var(--muted)}
+.bar{height:7px;border-radius:4px;background:var(--line);overflow:hidden;flex:1}
+.bar b{display:block;height:100%;background:linear-gradient(90deg,var(--haldi),var(--kumkum));border-radius:4px;transition:width .4s ease}
+
+/* timeline */
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:grid;grid-template-columns:76px 1fr auto;gap:12px;align-items:center;padding:14px 0;border-top:1px dashed var(--line)}
+.tl li:first-child{border-top:0}
+.tl .when b{display:block;font-weight:600;font-size:15px}
+.tl .when span{font-size:12px;color:var(--muted)}
+.tl .what{min-width:0}
+.tl .what b{font-weight:600;font-size:16.5px;overflow-wrap:anywhere}
+.tl .what p{margin:2px 0 0;font-size:13.5px;color:var(--muted);overflow-wrap:anywhere}
+.tl .act{display:flex;align-items:center;gap:8px}
+.chip{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;border-radius:20px;padding:2px 8px;margin-left:6px;vertical-align:2px}
+.chip.next{background:var(--kumkum);color:var(--on-accent)}
+.chip.fri{border:1px solid var(--line);color:var(--muted)}
+.tick{width:42px;height:42px;border-radius:50%;border:2px solid var(--line);background:transparent;display:grid;place-items:center;font-size:18px;color:var(--line);transition:all .15s ease}
+.tick:hover{border-color:var(--done);color:var(--done)}
+.tick[aria-pressed="true"]{background:var(--done);border-color:var(--done);color:var(--paper);box-shadow:0 6px 14px -6px var(--done)}
+.tick.arm{background:var(--kumkum);border-color:var(--kumkum);color:var(--on-accent)}
+.cnt{border:1px solid var(--line);background:var(--sky);border-radius:20px;padding:8px 12px;font-weight:600;font-size:14.5px;min-height:42px}
+.cnt.full{border-color:var(--done);color:var(--done)}
+li.isdone .what b{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--done) 60%,transparent)}
+
+/* counter */
+.pick{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:none}
+.pick button{flex:none;border:1px solid var(--line);background:var(--paper);border-radius:22px;padding:9px 15px;font-weight:600;font-size:14.5px;min-height:42px}
+.pick button[aria-pressed="true"]{background:var(--kumkum);color:var(--on-accent);border-color:var(--kumkum);box-shadow:0 6px 16px -8px var(--glow)}
+.pick button .ok{color:var(--done);margin-left:4px}
+.pick button[aria-pressed="true"] .ok{color:inherit}
+.mala{position:relative;max-width:360px;margin:6px auto 0}
+.mala svg{display:block;width:100%;height:auto;overflow:visible}
+.mala .thread{fill:none;stroke:color-mix(in srgb,var(--haldi) 45%,var(--line));stroke-width:1.4}
+.mala .bead{fill:url(#g-off);transition:fill .15s}
+.mala .bead.on{fill:url(#g-on)}
+.mala .bead.cur{fill:url(#g-cur)}
+.mala .meru{fill:url(#g-cur)}
+.mala .tassel{stroke:var(--kumkum);stroke-width:2;stroke-linecap:round}
+.tap{position:absolute;inset:15%;border-radius:50%;border:0;overflow:hidden;color:var(--on-accent);
+  background:var(--kumkum);
+  background:radial-gradient(circle at 34% 28%,color-mix(in srgb,var(--kumkum) 70%,#fff) 0%,var(--kumkum) 48%,color-mix(in srgb,var(--kumkum) 72%,#000) 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  box-shadow:0 18px 36px -14px var(--glow),inset 0 -6px 18px rgba(0,0,0,.18),inset 0 4px 10px rgba(255,255,255,.18);
+  transition:transform .08s ease;user-select:none}
+.tap::before{content:"ॐ";position:absolute;font-family:var(--display);font-size:170px;line-height:1;opacity:.1;top:50%;left:50%;transform:translate(-50%,-46%);pointer-events:none}
+.tap:active{transform:scale(.965)}
+.tap.full{background:var(--done);background:radial-gradient(circle at 34% 28%,color-mix(in srgb,var(--done) 70%,#fff) 0%,var(--done) 50%,color-mix(in srgb,var(--done) 70%,#000) 100%);box-shadow:0 18px 36px -14px var(--done)}
+.tap > *{position:relative}
+.tap .n{font-size:76px;font-weight:700;line-height:1}
+.tap .of{font-size:17px;font-weight:500;opacity:.92}
+.tap .hint{font-size:13px;opacity:.85;margin-top:6px}
+.cmeta{text-align:center;color:var(--muted);font-size:14px;margin-top:8px;min-height:20px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 15px;font-weight:600;min-height:44px;transition:transform .08s ease}
+.btn:active{transform:scale(.98)}
+.btn.pri{background:var(--kumkum);color:var(--on-accent);border-color:var(--kumkum);box-shadow:0 8px 18px -10px var(--glow)}
+.btn.ok{background:var(--done);color:var(--paper);border-color:var(--done);box-shadow:0 8px 18px -10px var(--done)}
+.btn.warn{color:var(--kumkum)}
+.btn.big{width:100%;min-height:54px;font-size:17px;border-radius:16px}
+.row.center{justify-content:center}
+.batch{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}
+.field{border:1px solid var(--line);background:var(--sky);border-radius:12px;padding:10px 12px;min-height:44px;width:100%}
+.mantra{font-family:var(--display);font-size:19px;line-height:1.75;white-space:pre-line;margin:8px 0 0;overflow-wrap:anywhere}
+.note{font-size:13px;color:var(--muted);margin:8px 0 0}
+.tapmode{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.tapmode .inl{justify-content:center}
+.tapmode .inl small{color:var(--muted);font-size:13px}
+.tapmode .field{width:auto;min-height:38px;padding:6px 10px}
+.malas{display:flex;flex-direction:column;gap:10px}
+.malas-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.malas-h small{color:var(--muted);font-size:13px;white-space:nowrap}
+.malas-h .field{width:auto;min-height:38px;padding:6px 10px}
+.malabtns{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.malabtns .btn{display:flex;flex-direction:column;align-items:center;gap:0;padding:8px 2px;line-height:1.15}
+.malabtns .btn b{font-size:18px;color:var(--kumkum)}
+.malabtns .btn small{font-size:11px;color:var(--muted);font-weight:500}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--sky);border:1px solid var(--line);border-radius:14px;padding:4px}
+.modes button{border:0;background:transparent;border-radius:11px;padding:10px 8px;font-weight:600;font-size:14.5px;color:var(--muted)}
+.modes button[aria-pressed="true"]{background:var(--paper);color:var(--ink);box-shadow:var(--shadow)}
+
+/* overview */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{background:var(--paper);border:1px solid color-mix(in srgb,var(--line) 70%,transparent);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)}
+.tile b{display:block;font-size:34px;font-weight:700;line-height:1.05;color:var(--kumkum)}
+.tile span{font-size:13px;color:var(--muted)}
+.week{display:grid;grid-template-columns:92px repeat(7,1fr);gap:8px 4px;align-items:center;margin-top:10px}
+.week .h{font-size:12px;color:var(--muted);text-align:center}
+.week .l{font-size:14px;font-weight:600}
+.dot{width:22px;height:22px;border-radius:50%;margin:0 auto;border:1.5px solid var(--line);
+  background:conic-gradient(var(--haldi) calc(var(--p,0)*1%),transparent 0)}
+.dot.full{background:var(--done);border-color:var(--done)}
+.lamps{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.lamp{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--muted)}
+.lamp.on{background:var(--haldi);border-color:var(--haldi);color:var(--paper)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:10px}
+.cal .h{font-size:12px;color:var(--muted);text-align:center;font-weight:600}
+.cal button{aspect-ratio:1;border-radius:10px;border:1px solid var(--line);font-size:13.5px;
+  background:color-mix(in srgb,var(--haldi) calc(var(--f,0)*70%),var(--paper))}
+.cal button.full{background:var(--done);border-color:var(--done);color:var(--paper);font-weight:700}
+.cal button.today{outline:2px solid var(--ink);outline-offset:1px}
+.cal button:disabled{opacity:.35;cursor:default}
+.jcal button{aspect-ratio:auto;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:3px 0}
+.jcal button small{font-size:11px;color:var(--muted);line-height:1.1}
+.jcal button.full small{color:inherit}
+.jcal button.sel{outline:3px solid var(--kumkum);outline-offset:1px}
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{padding:9px 6px;text-align:right;border-top:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+thead th{border-top:0;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+/* japas list */
+.jl{list-style:none;margin:8px 0 0;padding:0}
+.jl li{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 0;border-top:1px dashed var(--line)}
+.jl b{font-weight:600}
+.jl p{margin:1px 0 0;font-size:13px;color:var(--muted)}
+.jl li.off b{text-decoration:line-through;color:var(--muted)}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:13.5px;font-weight:600}
+label.f small{font-weight:400;color:var(--muted)}
+.days{display:flex;gap:6px;flex-wrap:wrap}
+.days label{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px;display:flex;gap:6px;align-items:center}
+.inl{display:flex;gap:8px;align-items:center;font-weight:500}
+dialog{border:1px solid var(--line);border-radius:22px;background:var(--paper);color:var(--ink);padding:20px;width:min(520px,calc(100vw - 24px));max-height:88vh;box-shadow:0 30px 60px -20px rgba(0,0,0,.45)}
+dialog::backdrop{background:rgba(20,10,10,.5);backdrop-filter:blur(3px)}
+dialog h2{font-size:22px;margin-bottom:12px}
+.empty{text-align:center;padding:26px 18px}
+.empty .big-om{font-family:var(--display);font-size:56px;line-height:1;color:var(--haldi)}
+
+/* appearance picker */
+.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.swatch{border:2px solid var(--line);border-radius:16px;background:var(--paper);padding:8px 6px 9px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:600}
+.swatch i{width:100%;height:42px;border-radius:10px;display:block}
+.swatch[aria-pressed="true"]{border-color:var(--kumkum);box-shadow:0 6px 16px -8px var(--glow)}
+
+/* learn */
+.lh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.lh h2{font-size:22px}
+a.btn{text-decoration:none;display:inline-flex;align-items:center;color:var(--ink)}
+a.btn.pri{color:var(--on-accent)}
+details.an{border-top:1px dashed var(--line)}
+details.an summary{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:13px 0;cursor:pointer;list-style:none;font-weight:600}
+details.an summary::-webkit-details-marker{display:none}
+details.an .body{display:flex;flex-direction:column;gap:12px;padding:0 0 16px}
+.st{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;border-radius:20px;padding:3px 9px;border:1px solid var(--line);color:var(--muted)}
+.st.s1{border-color:var(--haldi);color:var(--haldi)}
+.st.s2{background:var(--done);border-color:var(--done);color:var(--paper)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--sky);border-color:var(--ink)}
+audio{width:100%}
+.muted{color:var(--muted);font-weight:500;font-size:14px}
+
+/* bottom dock: player + floating tab bar */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:5;padding:0 10px calc(10px + var(--safe-b));pointer-events:none}
+.dock > *{pointer-events:auto;max-width:600px;margin:0 auto}
+#player{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:12px 0 10px;margin-bottom:8px;box-shadow:var(--shadow)}
+#player .in{padding:0 14px;display:flex;flex-direction:column;gap:8px}
+#player .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+#player .top b{font-weight:600;overflow-wrap:anywhere}
+body.playing{padding-bottom:calc(270px + var(--safe-b))}
+.tadd{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:12px}
+nav.tabs{background:color-mix(in srgb,var(--paper) 86%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border:1px solid color-mix(in srgb,var(--line) 80%,transparent);border-radius:24px;box-shadow:0 14px 34px -14px rgba(0,0,0,.35)}
+nav.tabs div{display:grid;grid-template-columns:repeat(5,1fr);padding:5px}
+nav.tabs a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 7px;border-radius:18px;text-decoration:none;color:var(--muted);font-size:12px;font-weight:600}
+nav.tabs a svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs a[aria-current="page"]{color:var(--kumkum);background:color-mix(in srgb,var(--kumkum) 12%,transparent)}
+[hidden]{display:none!important}
+/* ---- motion and ornament ---- */
+.toran{height:22px;margin:0 -16px;position:relative;pointer-events:none;
+  background:
+    radial-gradient(circle 5.5px at 9px 9px,#F59E0B 92%,transparent) 0 0/18px 22px repeat-x,
+    radial-gradient(circle 5.5px at 9px 9px,#EA580C 92%,transparent) 9px 4px/18px 22px repeat-x,
+    radial-gradient(ellipse 4px 7px at 9px 14px,#2F7D32 90%,transparent) 0 5px/72px 22px repeat-x;
+  -webkit-mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+  filter:drop-shadow(0 2px 2px rgba(120,50,0,.18));opacity:.95}
+@keyframes sky{0%{background-position:0% 0%}100%{background-position:100% 100%}}
+.hero{background-size:180% 180%;animation:sky 16s ease-in-out infinite alternate}
+@keyframes glow{0%,100%{transform:scale(1);opacity:.25}50%{transform:scale(1.5);opacity:.08}}
+.sunglow{transform-box:fill-box;transform-origin:center;animation:glow 3.2s ease-in-out infinite}
+:root[data-dark] .hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.8;
+  background-image:radial-gradient(1.4px 1.4px at 12% 22%,#fff,transparent),radial-gradient(1.2px 1.2px at 32% 12%,#fff,transparent),
+    radial-gradient(1.6px 1.6px at 58% 26%,#fff,transparent),radial-gradient(1.1px 1.1px at 76% 10%,#fff,transparent),
+    radial-gradient(1.3px 1.3px at 88% 34%,#fff,transparent),radial-gradient(1px 1px at 44% 40%,#fff,transparent),
+    radial-gradient(1.2px 1.2px at 22% 48%,#fff,transparent),radial-gradient(1px 1px at 68% 44%,#fff,transparent);
+  animation:twinkle 3.5s ease-in-out infinite alternate}
+@keyframes twinkle{from{opacity:.35}to{opacity:.95}}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+section.enter > *{animation:rise .5s cubic-bezier(.2,.75,.25,1) both}
+section.enter > *:nth-child(2){animation-delay:.06s}
+section.enter > *:nth-child(3){animation-delay:.12s}
+section.enter > *:nth-child(4){animation-delay:.18s}
+section.enter > *:nth-child(5){animation-delay:.24s}
+section.enter > *:nth-child(n+6){animation-delay:.3s}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.22)}100%{transform:scale(1)}}
+nav.tabs a[aria-current="page"] svg{animation:pop .4s ease}
+.mandala{position:absolute;inset:-4%;width:108%;height:108%;pointer-events:none;opacity:.55;animation:spin 120s linear infinite}
+.mandala *{fill:none;stroke:color-mix(in srgb,var(--haldi) 55%,transparent);stroke-width:.8}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mala > svg:not(.mandala){position:relative}
+.tapring{position:absolute;inset:12.5%;border-radius:50%;pointer-events:none;
+  background:conic-gradient(from 0deg,var(--haldi) calc(var(--p,0)*1%),color-mix(in srgb,var(--line) 70%,transparent) 0);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5px));mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5px))}
+.tapring.full{background:var(--done)}
+.ripple{position:absolute;left:50%;top:50%;width:70%;aspect-ratio:1;border-radius:50%;pointer-events:none;
+  border:3px solid var(--kumkum);transform:translate(-50%,-50%) scale(.6);opacity:.7;animation:ripple .65s ease-out forwards}
+@keyframes ripple{to{transform:translate(-50%,-50%) scale(1.25);opacity:0}}
+.plus{position:absolute;left:50%;top:22%;transform:translateX(-50%);font-weight:700;font-size:22px;color:var(--kumkum);pointer-events:none;
+  text-shadow:0 2px 6px rgba(0,0,0,.12);animation:floatup .9s ease-out forwards}
+@keyframes floatup{from{opacity:1;transform:translate(-50%,0)}to{opacity:0;transform:translate(-50%,-46px)}}
+.tap .n.bump{animation:pop .22s ease}
+.petals{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+.petal{position:absolute;top:-30px;width:12px;height:18px;border-radius:60% 0 60% 0;opacity:.95;animation:fall linear forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--rot))}}
+.toast{position:fixed;left:50%;top:calc(18px + var(--safe-t));transform:translate(-50%,-20px);z-index:51;opacity:0;max-width:calc(100vw - 32px);
+  background:linear-gradient(135deg,var(--hero-a),var(--hero-b) 60%,var(--hero-c));color:var(--hero-ink);
+  padding:10px 20px 10px 16px;border-radius:22px;font-weight:700;box-shadow:0 16px 36px -14px var(--glow);
+  display:flex;align-items:center;gap:10px;animation:toast 2.8s ease forwards}
+.toast span{display:flex;flex-direction:column;line-height:1.2;min-width:0}.toast small{font-weight:500;font-size:12.5px;opacity:.92;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toast b{font-family:var(--display);font-size:22px;font-weight:400}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,-20px)}12%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-12px)}}
+/* opening: a lotus blooms with a glowing Om */
+#intro{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  background:radial-gradient(120% 80% at 50% 30%,var(--hero-a),var(--hero-b) 55%,var(--hero-c));color:var(--hero-ink);transition:opacity .5s ease,visibility .5s}
+#intro.done{opacity:0;visibility:hidden}
+#intro svg{width:min(62vw,260px);height:auto;overflow:visible}
+#intro .petal-l{transform-box:fill-box;transform-origin:50% 100%;animation:bloom .9s cubic-bezier(.2,.8,.25,1.2) both}
+@keyframes bloom{from{transform:rotate(0deg) scale(.15);opacity:0}to{transform:rotate(var(--r)) scale(1);opacity:1}}
+#intro .om-big{font-family:var(--display);font-size:64px;line-height:1;margin-top:-6px;opacity:0;
+  text-shadow:0 0 24px rgba(255,236,180,.9),0 0 60px rgba(255,200,120,.6);animation:omin .8s .55s ease forwards}
+#intro .name{font-family:var(--display);font-size:24px;opacity:0;animation:omin .7s .8s ease forwards}
+@keyframes omin{from{opacity:0;transform:translateY(8px) scale(.9)}to{opacity:1;transform:none}}
+#intro .halo{position:absolute;width:min(90vw,420px);aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,240,200,.35),transparent 65%);animation:halo 2.4s ease-in-out infinite}
+@keyframes halo{0%,100%{transform:scale(.9);opacity:.6}50%{transform:scale(1.08);opacity:1}}
+/* diya with a flickering flame in the sky card */
+.hero svg.diya{position:absolute;right:18px;top:16px;width:38px;height:50px;display:block;pointer-events:none;z-index:1}
+.diya .flame{transform-box:fill-box;transform-origin:50% 100%;animation:flicker 1.4s ease-in-out infinite}
+.diya .aura{transform-box:fill-box;transform-origin:center;animation:aura 2.2s ease-in-out infinite}
+@keyframes flicker{0%,100%{transform:scaleY(1) skewX(0)}25%{transform:scaleY(1.12) skewX(-3deg)}50%{transform:scaleY(.94) skewX(2deg)}75%{transform:scaleY(1.06) skewX(-1deg)}}
+@keyframes aura{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:.9;transform:scale(1.18)}}
+.hero .eyebrow,.hero .greet{padding-right:46px}
+/* golden sparks drifting up behind everything */
+.sparks{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.sparks i{position:absolute;bottom:-12px;width:5px;height:5px;border-radius:50%;
+  background:radial-gradient(circle,#FFE7A8,color-mix(in srgb,var(--haldi) 70%,transparent) 60%,transparent 70%);
+  box-shadow:0 0 8px color-mix(in srgb,var(--haldi) 60%,transparent);opacity:0;animation:spark linear infinite}
+@keyframes spark{0%{opacity:0;transform:translate(0,0)}10%{opacity:.75}85%{opacity:.5}100%{opacity:0;transform:translate(var(--sx),-105vh)}}
+.wrap{position:relative;z-index:1}
+/* breathing Om in the header */
+.brand .om{animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{box-shadow:0 6px 16px -6px var(--glow);transform:scale(1)}50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--haldi) 22%,transparent),0 8px 22px -6px var(--glow);transform:scale(1.04)}}
+/* the bead under your thumb pulses */
+.mala .bead.cur{transform-box:fill-box;transform-origin:center;animation:beadpulse 1.1s ease-in-out infinite}
+@keyframes beadpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.45)}}
+/* a full round of the mala */
+.burst{position:absolute;left:50%;top:50%;width:92%;aspect-ratio:1;border-radius:50%;pointer-events:none;
+  border:4px solid var(--haldi);box-shadow:0 0 30px var(--haldi),inset 0 0 30px color-mix(in srgb,var(--haldi) 50%,transparent);
+  transform:translate(-50%,-50%) scale(.75);opacity:.95;animation:burst .9s ease-out forwards}
+@keyframes burst{to{transform:translate(-50%,-50%) scale(1.18);opacity:0}}
+.roundtag{position:absolute;left:50%;top:6%;transform:translateX(-50%);padding:5px 12px;border-radius:999px;pointer-events:none;
+  background:var(--haldi);color:#fff;font-weight:700;font-size:14px;white-space:nowrap;box-shadow:0 8px 18px -8px var(--haldi);animation:tagup 1.6s ease forwards}
+@keyframes tagup{0%{opacity:0;transform:translate(-50%,10px) scale(.8)}15%{opacity:1;transform:translate(-50%,0) scale(1.05)}75%{opacity:1;transform:translate(-50%,-6px)}100%{opacity:0;transform:translate(-50%,-18px)}}
+/* gold shimmer across a row you just finished */
+.tl li{position:relative;overflow:hidden}
+.tl li.shine::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(100deg,transparent 20%,color-mix(in srgb,var(--haldi) 40%,transparent) 50%,transparent 80%);
+  transform:translateX(-110%);animation:shine 1s ease-out forwards}
+@keyframes shine{to{transform:translateX(110%)}}
+@media (prefers-reduced-motion:reduce){#intro,.sparks,.burst{display:none!important}}
+@media (prefers-reduced-motion:reduce){*,*::before{animation:none!important;transition:none!important}.petals,.ripple,.plus{display:none}.toast{opacity:1;transform:translate(-50%,0)}}
+@media (max-width:380px){.tap .n{font-size:62px}.tl li{grid-template-columns:64px 1fr auto;gap:8px}.week{grid-template-columns:78px repeat(7,1fr)}.swatches{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div id="intro" aria-hidden="true"><div class="halo"></div>
+  <svg viewBox="-110 -120 220 140">
+    <defs>
+      <linearGradient id="pk" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#E2779F"/><stop offset="1" stop-color="#FFE3EC"/></linearGradient>
+      <linearGradient id="pk2" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#C2366B"/><stop offset="1" stop-color="#FFC2D4"/></linearGradient>
+    </defs>
+    <g fill="url(#pk2)">
+      <path class="petal-l" style="--r:-78deg;animation-delay:.05s" d="M0 0 C 16 -22 16 -52 0 -72 C -16 -52 -16 -22 0 0Z"/>
+      <path class="petal-l" style="--r:78deg;animation-delay:.05s" d="M0 0 C 16 -22 16 -52 0 -72 C -16 -52 -16 -22 0 0Z"/>
+      <path class="petal-l" style="--r:-52deg;animation-delay:.12s" d="M0 0 C 18 -26 18 -62 0 -86 C -18 -62 -18 -26 0 0Z"/>
+      <path class="petal-l" style="--r:52deg;animation-delay:.12s" d="M0 0 C 18 -26 18 -62 0 -86 C -18 -62 -18 -26 0 0Z"/>
+    </g>
+    <g fill="url(#pk)">
+      <path class="petal-l" style="--r:-26deg;animation-delay:.22s" d="M0 0 C 20 -30 20 -72 0 -100 C -20 -72 -20 -30 0 0Z"/>
+      <path class="petal-l" style="--r:26deg;animation-delay:.22s" d="M0 0 C 20 -30 20 -72 0 -100 C -20 -72 -20 -30 0 0Z"/>
+      <path class="petal-l" style="--r:0deg;animation-delay:.32s" d="M0 0 C 22 -32 22 -80 0 -110 C -22 -80 -22 -32 0 0Z"/>
+    </g>
+    <ellipse cx="0" cy="4" rx="70" ry="9" fill="#2F7D52" opacity=".85"/>
+  </svg>
+  <div class="om-big">ॐ</div><div class="name">Sandhya Japa</div>
+</div>
+<div class="sparks" aria-hidden="true"></div>
+<div class="wrap">
+  <div class="toran" aria-hidden="true"></div>
+  <header class="top">
+    <div class="brand"><span class="om" aria-hidden="true">ॐ</span><div><h1>Sandhya Japa</h1><small id="greet-sm"></small></div></div>
+    <div class="sync" id="sync" data-s="local"><i></i><span id="sync-t">Saved on this device</span></div>
+  </header>
+
+  <div class="datebar" id="datebar">
+    <button class="ibtn" id="d-prev" aria-label="Previous day">&#8249;</button>
+    <div class="d"><b id="d-main"></b><span id="d-sub"></span></div>
+    <button class="ibtn" id="d-next" aria-label="Next day">&#8250;</button>
+  </div>
+
+  <main>
+    <section id="v-today" class="stack"></section>
+    <section id="v-count" class="stack" hidden></section>
+    <section id="v-learn" class="stack" hidden></section>
+    <section id="v-overview" class="stack" hidden></section>
+    <section id="v-japas" class="stack" hidden></section>
+  </main>
+</div>
+
+<div class="dock">
+<div id="player" hidden><div class="in">
+  <div class="top"><b id="p-title"></b><button class="btn" id="p-close">Stop</button></div>
+  <audio id="p-audio" controls preload="auto"></audio>
+  <div class="row" style="align-items:center"><label class="inl" for="p-speed">Speed <select class="field" style="width:auto" id="p-speed"><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1x</option></select></label><label class="inl" for="p-loop"><input type="checkbox" id="p-loop"> Repeat this one</label></div>
+</div></div>
+<nav class="tabs" aria-label="Sections"><div>
+  <a href="#today" data-v="today"><svg viewBox="0 0 24 24"><path d="M3 17h18M6 17a6 6 0 0 1 12 0M12 5v3M4.5 9.5l2 2M19.5 9.5l-2 2"/></svg>Today</a>
+  <a href="#count" data-v="count"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" stroke-dasharray="1.2 3.2"/><circle cx="12" cy="12" r="3.5"/></svg>Counter</a>
+  <a href="#learn" data-v="learn"><svg viewBox="0 0 24 24"><path d="M4 5.5c3-1 5.500-.5 8 1.500 2.500-2 5-2.500 8-1.500v12.500c-3-1-5.500-.5-8 1.500-2.500-2-5-2.500-8-1.500zM12 7v12.500"/></svg>Learn</a>
+  <a href="#overview" data-v="overview"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>Overview</a>
+  <a href="#japas" data-v="japas"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Japas</a>
+</div></nav>
+</div>
+
+<dialog id="dlg"><form id="dlg-form" class="stack" novalidate></form></dialog>
+
+<script>
+"use strict";
+/* ---------- defaults ---------- */
+const GAYATRI = "ॐ भूर्भुवः स्वः । तत्सवितुर्वरेण्यं\nभर्गो देवस्य धीमहि । धियो यो नः प्रचोदयात् ॥\n\nOm bhur bhuvah svah, tat savitur varenyam,\nbhargo devasya dhimahi, dhiyo yo nah prachodayat";
+const ALL = [0,1,2,3,4,5,6];
+/* A new install starts with Gayatri japa only. People add their own japas, tasks and mantras in the Japas tab. */
+const DEFAULT_ITEMS = [
+  {id:"pratah", kind:"japa", group:"sandhya", name:"Pratah Sandhya", detail:"Gayatri japa", target:108, when:"days", days:ALL, slot:"sunrise", mantra:GAYATRI},
+  {id:"sayam", kind:"japa", group:"sandhya", name:"Sayam Sandhya", detail:"Gayatri japa", target:108, when:"days", days:ALL, slot:"sunset", mantra:GAYATRI}
+];
+const PLACES = {blr:{name:"Bengaluru",lat:12.9716,lon:77.5946}, mys:{name:"Mysuru",lat:12.2958,lon:76.6394}};
+const SLOT_ORDER = {bath:0,sunrise:1,morning:2,noon:3,sunset:4,evening:5,anytime:6};
+const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const LS_KEY = "sandhya-japa-v1";
+
+/* ---------- pure helpers ---------- */
+const pad = n => String(n).padStart(2,"0");
+const ymd = d => d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const parseYmd = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y,m-1,d); };
+const addDays = (d,n) => new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
+const clone = o => JSON.parse(JSON.stringify(o));
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtTime = d => d.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+const nf = n => Number(n).toLocaleString("en-IN");
+
+/* Sunrise equation (standard solar position approximation). Returns Dates for rise, noon, set. */
+function sunTimes(date, lat, lon){
+  const rad = Math.PI/180;
+  const n = Math.round(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate(),12)/86400000 + 2440587.5 - 2451545);
+  const js = n - lon/360;
+  const M = ((357.5291 + 0.98560028*js) % 360 + 360) % 360;
+  const C = 1.9148*Math.sin(M*rad) + 0.02*Math.sin(2*M*rad) + 0.0003*Math.sin(3*M*rad);
+  const L = (M + C + 180 + 102.9372) % 360;
+  const jt = 2451545 + js + 0.0053*Math.sin(M*rad) - 0.0069*Math.sin(2*L*rad);
+  const dec = Math.asin(Math.sin(L*rad)*Math.sin(23.4397*rad));
+  const cosw = (Math.sin(-0.833*rad) - Math.sin(lat*rad)*Math.sin(dec)) / (Math.cos(lat*rad)*Math.cos(dec));
+  const w = Math.acos(Math.max(-1,Math.min(1,cosw)))/rad;
+  const toDate = j => new Date((j - 2440587.5)*86400000);
+  return {rise:toDate(jt - w/360), noon:toDate(jt), set:toDate(jt + w/360)};
+}
+
+/* ---------- state ---------- */
+function defaultCfg(){
+  return {v:2, t:0, items:clone(DEFAULT_ITEMS), place:"blr", lat:PLACES.blr.lat, lon:PLACES.blr.lon,
+          bornMode:"weekday", bornDow:6, bday:"", nineStart:ymd(new Date()), once:{}, learn:{},
+          palette:"ushas", mode:"auto", malaSize:108, tapMode:"bead",
+          tracks:[{id:"t-aditya",name:"Aditya Hrudayam"},{id:"t-rama",name:"Rama Raksha Stotra"}]};
+}
+const PALETTES = {ushas:"Dawn", sandhya:"Dusk", tulsi:"Tulsi", kamala:"Lotus"};
+function normCfg(c){
+  const d = defaultCfg();
+  const out = Object.assign(d, c || {});
+  if((c && c.v || 1) < 2 && Array.isArray(out.items)) out.items = out.items.filter(it => it.id !== "madhyahna"); /* Madhyahnika removed in v2 */
+  out.v = 2;
+  if(!Array.isArray(out.items)) out.items = clone(DEFAULT_ITEMS);
+  if(!PALETTES[out.palette]) out.palette = "ushas";
+  if(!["auto","light","dark"].includes(out.mode)) out.mode = "auto";
+  if(![108,54,27].includes(out.malaSize)) out.malaSize = 108;
+  if(!["bead","mala"].includes(out.tapMode)) out.tapMode = "bead";
+  out.items.forEach(it => { it.target = Math.max(1, parseInt(it.target,10) || 1); if(!Array.isArray(it.days)) it.days = ALL.slice(); });
+  if(!out.once || typeof out.once !== "object") out.once = {};
+  if(!out.learn || typeof out.learn !== "object") out.learn = {};
+  if(!Array.isArray(out.tracks)) out.tracks = [{id:"t-aditya",name:"Aditya Hrudayam"},{id:"t-rama",name:"Rama Raksha Stotra"}];
+  return out;
+}
+const S = {cfg:defaultCfg(), months:{}, view:ymd(new Date()), sel:null, cal:null};
+function loadLocal(){
+  try{ const raw = localStorage.getItem(LS_KEY); if(!raw) return;
+       const o = JSON.parse(raw); S.cfg = normCfg(o.cfg); S.months = o.months || {}; }catch(e){}
+}
+/* ---------- platform layer ----------
+   The same page runs as: a website / installed web app ("web"), the Android and iOS apps built with
+   Capacitor ("android" / "ios"), and the Windows, macOS and Linux apps built with Electron ("desktop").
+   Everything platform-specific goes through these few functions. */
+const CAP = window.Capacitor, PL = (CAP && CAP.Plugins) || {};
+const PLATFORM = CAP && CAP.isNativePlatform && CAP.isNativePlatform() ? CAP.getPlatform() : (window.desktop ? "desktop" : "web");
+const IS_MOBILE_APP = PLATFORM === "ios" || PLATFORM === "android";
+const CAN_REMIND = (IS_MOBILE_APP && !!PL.LocalNotifications) || (PLATFORM === "desktop" && !!window.desktop.setReminders);
+document.documentElement.dataset.platform = PLATFORM;
+function haptic(kind){
+  try{
+    if(IS_MOBILE_APP && PL.Haptics){
+      const p = kind === "done" ? PL.Haptics.notification({type:"SUCCESS"}) : PL.Haptics.impact({style:"LIGHT"});
+      if(p && p.catch) p.catch(() => {});
+    }else if(navigator.vibrate) navigator.vibrate(kind === "done" ? [60,40,120] : 8);
+  }catch(e){}
+}
+function openExternal(url){
+  if(!okUrl(url)) return;
+  if(IS_MOBILE_APP && PL.AppLauncher) PL.AppLauncher.openUrl({url}).catch(() => window.open(url, "_blank"));
+  else if(PLATFORM === "desktop" && window.desktop.openExternal) window.desktop.openExternal(url);
+  else window.open(url, "_blank", "noopener");
+}
+/* On phones the OS may clear web storage when space is low, so the apps keep a second copy in native storage. */
+let mirrorTimer = null;
+function saveLocal(){
+  const txt = JSON.stringify({cfg:S.cfg, months:S.months});
+  try{ localStorage.setItem(LS_KEY, txt); }catch(e){}
+  if(IS_MOBILE_APP && PL.Preferences){
+    clearTimeout(mirrorTimer);
+    mirrorTimer = setTimeout(() => { PL.Preferences.set({key:LS_KEY, value:txt}).catch(() => {}); }, 400);
+  }
+}
+async function loadMirror(){
+  if(!(IS_MOBILE_APP && PL.Preferences)) return false;
+  try{
+    let has = false; try{ has = !!localStorage.getItem(LS_KEY); }catch(e){}
+    if(has) return false;
+    const r = await PL.Preferences.get({key:LS_KEY});
+    if(!r || !r.value) return false;
+    const o = JSON.parse(r.value); S.cfg = normCfg(o.cfg); S.months = o.months || {};
+    try{ localStorage.setItem(LS_KEY, r.value); }catch(e){}
+    return true;
+  }catch(e){ return false; }
+}
+let remindTimer = null;
+function postReminders(){ if(!CAN_REMIND) return; clearTimeout(remindTimer); remindTimer = setTimeout(sendReminders, 800); }
+async function sendReminders(){
+  const list = S.cfg.remind === false ? [] : reminderList();
+  try{
+    if(IS_MOBILE_APP){
+      const LN = PL.LocalNotifications;
+      const perm = await LN.checkPermissions();
+      if(perm.display !== "granted") return;
+      const pend = await LN.getPending();
+      if(pend.notifications.length) await LN.cancel({notifications:pend.notifications.map(n => ({id:n.id}))});
+      if(list.length) await LN.schedule({notifications:list.map((r,i) => ({id:1000+i, title:r.title, body:r.body, schedule:{at:new Date(r.ts), allowWhileIdle:true}}))});
+    }else if(PLATFORM === "desktop") window.desktop.setReminders(list);
+  }catch(e){}
+}
+async function askReminderPermission(){
+  if(!IS_MOBILE_APP) return true;
+  try{ const r = await PL.LocalNotifications.requestPermissions(); return r.display === "granted"; }catch(e){ return false; }
+}
+function reminderList(){
+  const out = [], now = Date.now(), lead = {sunrise:-30, noon:0, sunset:-20};
+  for(let i=0;i<7;i++){
+    const d = addDays(new Date(), i), key = ymd(d), sun = sunTimes(d, S.cfg.lat, S.cfg.lon);
+    const at = {sunrise:sun.rise, noon:sun.noon, sunset:sun.set};
+    S.cfg.items.filter(it => it.group === "sandhya" && isDue(it,key) && lead[it.slot] !== undefined && !isDone(it,key)).forEach(it => {
+      const ts = at[it.slot].getTime() + lead[it.slot]*60000;
+      if(ts > now) out.push({ts, title:it.name, body:(it.detail||"Japa")+", "+it.target+" times. "+({sunrise:"Sunrise",noon:"Midday",sunset:"Sunset"}[it.slot])+" is at "+fmtTime(at[it.slot])+"."});
+    });
+  }
+  return out;
+}
+
+const todayKey = () => ymd(new Date());
+const rec = key => (S.months[key.slice(0,7)] || {})[key.slice(8)];
+const getCount = (key,id) => { const r = rec(key); return r && r.c && r.c[id] || 0; };
+function setCount(key,id,n){
+  n = Math.max(0, Math.min(1000000, Math.round(n) || 0));
+  const mk = key.slice(0,7), dd = key.slice(8);
+  const m = S.months[mk] || (S.months[mk] = {});
+  const r = m[dd] || (m[dd] = {c:{}, t:0});
+  if(n === 0) delete r.c[id]; else r.c[id] = n;
+  r.t = Date.now();
+  markDirty(mk);
+}
+function touchCfg(){ S.cfg.t = Date.now(); markDirty("config"); postReminders(); }
+const item = id => S.cfg.items.find(i => i.id === id);
+
+function isDue(it, key){
+  if(it.off) return false;
+  const d = parseYmd(key);
+  if(it.when === "once"){ const done = S.cfg.once[it.id]; return done ? done === key : key <= todayKey(); }
+  if(it.when === "born") return S.cfg.bornMode === "weekday" ? d.getDay() === S.cfg.bornDow : key.slice(5) === S.cfg.bday;
+  return it.days.includes(d.getDay());
+}
+const dueItems = key => S.cfg.items.filter(it => isDue(it,key))
+  .sort((a,b) => (SLOT_ORDER[a.slot] ?? 6) - (SLOT_ORDER[b.slot] ?? 6));
+const isDone = (it,key) => getCount(key,it.id) >= it.target;
+function dayFraction(key){
+  const due = dueItems(key).filter(it => it.when !== "once");
+  if(!due.length) return {f:0, done:0, total:0};
+  const done = due.filter(it => isDone(it,key)).length;
+  return {f:done/due.length, done, total:due.length};
+}
+function allKeys(){
+  const out = [];
+  for(const mk in S.months) for(const dd in S.months[mk]) out.push(mk+"-"+dd);
+  return out;
+}
+function sandhyaStreak(){
+  const ids = S.cfg.items.filter(i => i.group === "sandhya" && !i.off);
+  if(!ids.length) return 0;
+  const ok = key => ids.every(it => isDone(it,key));
+  let d = new Date(), n = 0;
+  if(!ok(ymd(d))) d = addDays(d,-1);
+  while(ok(ymd(d)) && n < 5000){ n++; d = addDays(d,-1); }
+  return n;
+}
+function nineFridays(){
+  const its = S.cfg.items.filter(i => i.nine && !i.off);
+  if(!its.length) return [];
+  return allKeys().filter(k => k >= S.cfg.nineStart && parseYmd(k).getDay() === 5 && its.every(it => isDone(it,k))).sort();
+}
+
+/* ---------- sync (per-person private data in the artifact database) ---------- */
+let col = null, flushing = false, timer = null;
+const dirty = new Set();
+function setSync(s){
+  const t = {local:"Saved on this device", saving:"Saving", synced:"Synced to your account", error:"Not synced, saved on this device"}[s];
+  const el = document.getElementById("sync"); el.dataset.s = s; document.getElementById("sync-t").textContent = t;
+}
+function markDirty(k){
+  dirty.add(k); saveLocal();
+  if(!col) return;
+  clearTimeout(timer); timer = setTimeout(flush, 1200);
+}
+async function flush(){
+  if(flushing || !col || !dirty.size) return;
+  flushing = true; setSync("saving");
+  try{
+    while(dirty.size){
+      const k = dirty.values().next().value; dirty.delete(k);
+      const body = k === "config" ? clone(S.cfg) : {days:clone(S.months[k] || {})};
+      try{ await col.doc(k === "config" ? "config" : "m-"+k).set(body); }
+      catch(e){ dirty.add(k); throw e; }
+    }
+    setSync("synced");
+  }catch(e){ setSync("error"); }
+  flushing = false;
+}
+const withTimeout = (p,ms) => Promise.race([p, new Promise((_,rej) => setTimeout(() => rej(new Error("timeout")), ms))]);
+async function pull(){
+  const snap = await withTimeout(col.get(), 10000);
+  const seen = new Set();
+  snap.docs.forEach(doc => {
+    const data = doc.data(); if(!data) return;
+    if(doc.id === "config"){
+      seen.add("config");
+      if((data.t||0) > (S.cfg.t||0)) S.cfg = normCfg(clone(data));
+      else if((S.cfg.t||0) > (data.t||0)) dirty.add("config");
+    }else if(doc.id.startsWith("m-")){
+      const mk = doc.id.slice(2); seen.add(mk);
+      const remote = clone(data.days || {}), local = S.months[mk] || (S.months[mk] = {});
+      for(const dd in remote){ if(!local[dd] || (remote[dd].t||0) > (local[dd].t||0)) local[dd] = remote[dd]; }
+      for(const dd in local){ if(!remote[dd] || (local[dd].t||0) > (remote[dd].t||0)) dirty.add(mk); }
+    }
+  });
+  for(const mk in S.months) if(!seen.has(mk) && Object.keys(S.months[mk]).length) dirty.add(mk);
+  if(!seen.has("config") && S.cfg.t) dirty.add("config");
+  saveLocal(); applyTheme(); render();
+  if(dirty.size) await flush(); else setSync("synced");
+}
+async function initSync(){
+  try{
+    if(!window.claude || !window.claude.use) return;
+    const [db,user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    if(!db || !user) return;
+    const uid = await user.id(); if(!uid) return;
+    col = db.collection("data/users/"+uid);
+    await pull();
+  }catch(e){ if(col) setSync("error"); }
+}
+document.addEventListener("visibilitychange", () => {
+  if(!document.hidden) postReminders();
+  if(!col) return;
+  if(document.hidden){ clearTimeout(timer); flush(); }
+  else if(!dirty.size && !flushing) pull().catch(() => setSync("error"));
+});
+
+/* ---------- rendering ---------- */
+const $ = s => document.querySelector(s);
+let VIEW = "today";
+
+function slotLabel(slot, sun){
+  switch(slot){
+    case "bath": return ["Early","early morning"];
+    case "sunrise": return [fmtTime(sun.rise),"before sunrise"];
+    case "morning": return ["Morning","after sunrise"];
+    case "noon": return [fmtTime(sun.noon),"around midday"];
+    case "sunset": return [fmtTime(sun.set),"around sunset"];
+    case "evening": return ["Evening","after sunset"];
+    default: return ["Any time","today"];
+  }
+}
+function scheduleText(it){
+  if(it.when === "once") return "One time";
+  if(it.when === "born") return S.cfg.bornMode === "weekday" ? "Every "+["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][S.cfg.bornDow]+" (born day)" : "On your birthday";
+  if(it.days.length === 7) return "Every day";
+  return it.days.map(d => DOW[d]).join(", ");
+}
+function placeName(){ return S.cfg.place === "custom" ? "Custom place" : PLACES[S.cfg.place].name; }
+function greeting(){
+  const h = new Date().getHours();
+  return h < 4 ? "Shubha ratri" : h < 12 ? "Suprabhatam" : h < 17 ? "Shubha madhyahna" : "Shubha sandhya";
+}
+
+function renderDatebar(){
+  const d = parseYmd(S.view), isToday = S.view === todayKey();
+  $("#d-main").textContent = d.toLocaleDateString("en-IN",{weekday:"long", day:"numeric", month:"short"});
+  $("#d-sub").innerHTML = isToday ? "Today" : '<button class="link" id="d-today">Back to today</button>';
+  $("#d-next").disabled = isToday;
+  $("#datebar").hidden = (VIEW === "overview" || VIEW === "japas" || VIEW === "learn");
+  $("#greet-sm").textContent = "Daily japa & sandhya";
+}
+
+function arcSvg(sun, key){
+  const isToday = key === todayKey(), now = Date.now();
+  const f = (now - sun.rise)/(sun.set - sun.rise);
+  const pt = t => [160 - 136*Math.cos(Math.PI*t), 96 - 70*Math.sin(Math.PI*t)];
+  const marks = [["pratah",0,"Pratah",sun.rise,"start"],["madhyahna",.5,"Madhyahnika",sun.noon,"middle"],["sayam",1,"Sayam",sun.set,"end"]];
+  let s = '<svg viewBox="0 0 320 140" role="img" aria-label="Sunrise, midday and sunset times"><path d="M24 96 A136 70 0 0 1 296 96" fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="2 5" stroke-linecap="round"/><line x1="8" y1="96" x2="312" y2="96" stroke="var(--line)" stroke-width="1"/>';
+  if(isToday && f >= 0 && f <= 1){ const [x,y] = pt(f); s += '<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="15" fill="var(--hero-ink,#fff)" opacity=".22" class="sunglow"/><circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="8" fill="#FFE7A8" stroke="#fff" stroke-width="1.5"/>'; }
+  marks.forEach(([id,t,label,time,anchor]) => {
+    const [x,y] = pt(t), it = item(id), done = it && !it.off && isDone(it,key);
+    const has = it && !it.off;
+    if(!has) label = t === .5 ? "Midday" : t === 0 ? "Sunrise" : "Sunset";
+    s += has ? '<circle cx="'+x+'" cy="'+y+'" r="6.5" fill="'+(done?"var(--done)":"var(--paper)")+'" stroke="'+(done?"#fff":"var(--ink)")+'" stroke-width="1.6"/>' : '<circle cx="'+x+'" cy="'+y+'" r="3" fill="var(--muted)"/>';
+    const tx = anchor === "start" ? 12 : anchor === "end" ? 308 : 160, ty = t === .5 ? 52 : 121;
+    s += '<text class="t-b num" x="'+tx+'" y="'+ty+'" text-anchor="'+anchor+'">'+esc(fmtTime(time))+'</text><text class="t-s" x="'+tx+'" y="'+(ty+14)+'" text-anchor="'+anchor+'">'+label+'</text>';
+  });
+  return s + "</svg>";
+}
+
+function emptyCard(text){
+  return '<div class="card empty"><div class="big-om" aria-hidden="true">ॐ</div><p>'+text+'</p><button class="btn pri" id="add-japa">Add a japa or task</button></div>';
+}
+function renderToday(){
+  const key = S.view, d = parseYmd(key), sun = sunTimes(d, S.cfg.lat, S.cfg.lon);
+  const due = dueItems(key), isToday = key === todayKey();
+  const doneN = due.filter(it => isDone(it,key)).length;
+  const nextId = isToday ? (due.find(it => !isDone(it,key)) || {}).id : null;
+  let h = '<div class="card arc hero">'+DIYA+'<div class="eyebrow">Sun at '+esc(placeName())+'</div>'+(isToday?'<p class="greet">'+greeting()+'</p>':"")+arcSvg(sun,key)+
+    '<div class="daysum"><span class="num">'+(due.length ? doneN+' of '+due.length+' done' : 'Nothing scheduled')+'</span><div class="bar"><b style="width:'+(due.length?Math.round(doneN/due.length*100):0)+'%"></b></div></div></div>';
+  if(!due.length){ $("#v-today").innerHTML = h + emptyCard("Nothing is scheduled for this day. Add a japa, set its count and mantra, and it shows up here."); return; }
+  h += '<div class="card"><div class="eyebrow">What to do, in order</div><ul class="tl">';
+  due.forEach(it => {
+    const [t1,t2] = slotLabel(it.slot, sun), n = getCount(key,it.id), done = n >= it.target;
+    const tags = (it.id === nextId ? '<span class="chip next">Next</span>' : "") + (it.when === "days" && it.days.length < 7 ? '<span class="chip fri">'+it.days.map(x => DOW[x]).join(" ")+'</span>' : "") + (it.when === "born" ? '<span class="chip fri">Born day</span>' : "") + (it.when === "once" ? '<span class="chip fri">One time</span>' : "");
+    h += '<li class="'+(done?"isdone":"")+'"><div class="when"><b class="num">'+esc(t1)+'</b><span>'+esc(t2)+'</span></div><div class="what"><b>'+esc(it.name)+'</b>'+tags+(it.detail?'<p>'+esc(it.detail)+'</p>':"")+'</div><div class="act">';
+    if(it.kind === "japa"){
+      h += '<button class="cnt num '+(done?"full":"")+'" data-open="'+esc(it.id)+'" aria-label="Open counter for '+esc(it.name)+'">'+nf(n)+' / '+nf(it.target)+'</button>';
+      h += '<button class="tick" data-full="'+esc(it.id)+'" aria-pressed="'+done+'" aria-label="'+(done?"Done. Tap twice to clear ":"Mark done, ")+esc(it.name)+'" title="'+(done?"Done":"Chanted on my mala: mark done")+'">&#10003;</button>';
+    }
+    else h += '<button class="tick" data-toggle="'+esc(it.id)+'" aria-pressed="'+done+'" aria-label="Mark '+esc(it.name)+' done">&#10003;</button>';
+    h += '</div></li>';
+  });
+  h += '</ul><p class="note">Counted on your own mala? Tap &#10003; to mark the full count done, or tap the number to count here.</p></div>';
+  if(d.getDay() === 5 && S.cfg.items.some(i => i.nine && !i.off)){
+    const nf9 = nineFridays();
+    h += '<div class="card"><div class="eyebrow">Friday pooja, 9 weeks</div><div class="lamps">'+
+      Array.from({length:9},(_,i) => '<div class="lamp '+(i<nf9.length?"on":"")+'">'+(i+1)+'</div>').join("")+
+      '</div><p class="note">'+Math.min(9,nf9.length)+' of 9 Fridays completed since '+esc(parseYmd(S.cfg.nineStart).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}))+'.</p></div>';
+  }
+  $("#v-today").innerHTML = h;
+}
+
+/* counter */
+function japasFor(key){ return dueItems(key).filter(it => it.kind === "japa"); }
+function beadCount(it){ return Math.min(108, it.target); }
+/* a lit diya for the sky card */
+const DIYA = '<svg class="diya" viewBox="0 0 38 50" aria-hidden="true">'+
+  '<defs><radialGradient id="dg" cx=".5" cy=".6" r=".5"><stop offset="0" stop-color="#FFE7A8" stop-opacity=".95"/><stop offset="1" stop-color="#FFB347" stop-opacity="0"/></radialGradient>'+
+  '<linearGradient id="df" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FF6B1A"/><stop offset=".55" stop-color="#FFB020"/><stop offset="1" stop-color="#FFF4C2"/></linearGradient>'+
+  '<linearGradient id="db" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6C453"/><stop offset="1" stop-color="#A86412"/></linearGradient></defs>'+
+  '<circle class="aura" cx="19" cy="22" r="17" fill="url(#dg)"/>'+
+  '<path class="flame" d="M19 8 C 24 16 24 24 19 30 C 14 24 14 16 19 8Z" fill="url(#df)"/>'+
+  '<path d="M3 32 Q 19 34 35 32 Q 33 44 19 45 Q 5 44 3 32Z" fill="url(#db)"/><ellipse cx="19" cy="32" rx="16" ry="2.6" fill="#7A4510"/></svg>';
+/* slowly turning mandala behind the mala */
+const MANDALA = (() => {
+  let s = '<svg class="mandala" viewBox="-100 -100 200 200" aria-hidden="true">';
+  for(let i=0;i<16;i++) s += '<ellipse cx="0" cy="-70" rx="9" ry="24" transform="rotate('+(i*22.5)+')"/>';
+  for(let i=0;i<32;i++) s += '<circle cx="0" cy="-94" r="2.2" transform="rotate('+(i*11.25)+')"/>';
+  for(let i=0;i<8;i++) s += '<path d="M0 -40 Q 14 -60 0 -84 Q -14 -60 0 -40" transform="rotate('+(i*45+22.5)+')"/>';
+  return s + '<circle r="97"/><circle r="44"/><circle r="40" stroke-dasharray="2 4"/></svg>';
+})();
+const BEAD_DEFS = '<defs>'+
+  '<radialGradient id="g-off" cx=".35" cy=".3" r=".75"><stop offset="0" style="stop-color:#fff;stop-opacity:.75"/><stop offset=".45" style="stop-color:var(--line)"/><stop offset="1" style="stop-color:var(--line)"/></radialGradient>'+
+  '<radialGradient id="g-on" cx=".35" cy=".3" r=".75"><stop offset="0" style="stop-color:#fff;stop-opacity:.9"/><stop offset=".35" style="stop-color:var(--haldi)"/><stop offset="1" style="stop-color:var(--haldi)"/></radialGradient>'+
+  '<radialGradient id="g-cur" cx=".35" cy=".3" r=".75"><stop offset="0" style="stop-color:#fff;stop-opacity:.85"/><stop offset=".35" style="stop-color:var(--kumkum)"/><stop offset="1" style="stop-color:var(--kumkum)"/></radialGradient>'+
+  '</defs>';
+function renderCount(){
+  const key = S.view, list = japasFor(key);
+  if(!list.length){ $("#v-count").innerHTML = emptyCard("No counted japa is scheduled for this day."); return; }
+  if(!list.some(i => i.id === S.sel)) S.sel = (list.find(i => !isDone(i,key)) || list[0]).id;
+  const it = item(S.sel), nb = beadCount(it), dayName = parseYmd(key).toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"});
+  let h = '<div class="pick" role="group" aria-label="Choose a japa">'+list.map(i => '<button data-sel="'+esc(i.id)+'" aria-pressed="'+(i.id===S.sel)+'">'+esc(i.name)+(isDone(i,key)?'<span class="ok">&#10003;</span>':"")+'</button>').join("")+'</div>';
+  let beads = "";
+  const R = 146, br = Math.max(2.6, Math.min(7.5, Math.PI*R/nb*0.74));
+  for(let i=0;i<nb;i++){ const a = -Math.PI/2 + 2*Math.PI*(i+1)/(nb+1); beads += '<circle class="bead" cx="'+(160+R*Math.cos(a)).toFixed(2)+'" cy="'+(160+R*Math.sin(a)).toFixed(2)+'" r="'+br.toFixed(2)+'"/>'; }
+  const MS = S.cfg.malaSize, malaTap = S.cfg.tapMode === "mala";
+  h += '<div class="tapmode"><div class="modes" role="group" aria-label="What one tap counts">'+
+       '<button data-tap="bead" aria-pressed="'+!malaTap+'">1 tap = 1</button><button data-tap="mala" aria-pressed="'+malaTap+'">1 tap = 1 mala</button></div>'+
+       '<label class="inl" for="c-malasize"><small>My mala has</small><select class="field" id="c-malasize">'+[108,54,27].map(v => '<option value="'+v+'"'+(MS===v?" selected":"")+'>'+v+' beads</option>').join("")+'</select></label></div>';
+  h += '<div class="mala">'+MANDALA+'<div class="tapring" id="tapring"></div><svg viewBox="0 0 320 320" aria-hidden="true">'+BEAD_DEFS+'<circle class="thread" cx="160" cy="160" r="'+R+'"/>'+
+       '<line class="tassel" x1="160" y1="5" x2="160" y2="-14"/><circle class="meru" cx="160" cy="14" r="'+(br+3).toFixed(2)+'"/>'+beads+'</svg>'+
+       '<button class="tap" id="tap" aria-label="'+(malaTap?"Count one mala of "+MS:"Count one")+'"><span class="n num" id="c-n">0</span><span class="of num" id="c-of"></span><span class="hint" id="c-hint">Tap to count</span></button></div>'+
+       '<div class="cmeta num" id="c-meta" aria-live="polite"></div>'+
+       '<div class="row center"><button class="btn" id="c-undo">'+(malaTap?"Undo 1 mala":"Undo 1")+'</button><button class="btn warn" id="c-reset">Reset to 0</button></div>';
+  h += '<div class="card stack"><div class="eyebrow">Chanted on your own mala?</div>'+
+       '<button class="btn ok big" id="c-done"></button>'+
+       '<div class="malas"><div class="malas-h"><b>Add several malas at once</b><small>1 mala = '+MS+'</small></div>'+
+         '<div class="malabtns">'+[1,2,3,5,10].map(n => '<button class="btn num" data-add="'+(n*MS)+'"><b>+'+n+'</b><small>'+nf(n*MS)+'</small></button>').join("")+'</div></div>'+
+       '<label class="f" for="batch-n">Enter the count for '+esc(dayName)+'</label>'+
+       '<div class="batch"><input class="field num" id="batch-n" type="number" inputmode="numeric" min="0" placeholder="Number" aria-label="Number of repetitions"><button class="btn pri" id="batch-add">Add</button><button class="btn" id="batch-set">Set total</button></div></div>';
+  h += japaCalendar(it);
+  h += '<div class="card"><div class="eyebrow">'+esc(it.name)+(it.detail?" · "+esc(it.detail):"")+'</div>'+(it.mantra?'<p class="mantra" lang="sa">'+esc(it.mantra)+'</p>':'<p class="note">No mantra text saved for this japa yet. Add it in the Japas tab with Edit.</p>')+(it.check?'<p class="note">'+esc(it.check)+'</p>':"")+'</div>';
+  $("#v-count").innerHTML = h;
+  paintCounter();
+}
+/* month calendar for one japa: every day shows that day's count; tap a day to enter or correct it */
+function calCell(it, k){
+  const tk = todayKey(), n = getCount(k,it.id), due = isDue(it,k), fut = k > tk;
+  const f = Math.min(1, n/it.target);
+  return '<button data-cday="'+k+'" class="'+(n>=it.target?"full":"")+(k===tk?" today":"")+(k===S.view?" sel":"")+'" style="--f:'+f.toFixed(2)+'" '+(fut||!due?"disabled":"")+' aria-label="'+k+', '+n+' of '+it.target+'"><span class="num">'+parseInt(k.slice(8),10)+'</span><small class="num">'+(n?nf(n):(due&&!fut?"–":""))+'</small></button>';
+}
+function monthSum(it, mk){
+  const nD = new Date(+mk.slice(0,4), +mk.slice(5), 0).getDate(); let total = 0, full = 0;
+  for(let dd=1; dd<=nD; dd++){ const c = getCount(mk+"-"+pad(dd), it.id); total += c; if(c >= it.target) full++; }
+  return nf(total)+" this month · full count on "+full+" day"+(full===1?"":"s");
+}
+function japaCalendar(it){
+  const mk = S.ccal || S.view.slice(0,7), first = parseYmd(mk+"-01"), y = first.getFullYear(), m = first.getMonth();
+  const nDays = new Date(y,m+1,0).getDate(), tk = todayKey();
+  let cells = "";
+  for(let dd=1; dd<=nDays; dd++) cells += calCell(it, mk+"-"+pad(dd));
+  return '<div class="card"><div class="eyebrow">'+esc(it.name)+', day by day</div>'+
+    '<div class="row" style="justify-content:space-between;align-items:center;margin-top:8px"><button class="ibtn" id="cc-prev" aria-label="Previous month">&#8249;</button><h2 style="font-size:20px">'+first.toLocaleDateString("en-IN",{month:"long",year:"numeric"})+'</h2><button class="ibtn" id="cc-next" aria-label="Next month" '+(mk>=tk.slice(0,7)?"disabled":"")+'>&#8250;</button></div>'+
+    '<div class="cal jcal">'+["S","M","T","W","T","F","S"].map(x => '<div class="h">'+x+'</div>').join("")+"<div></div>".repeat(first.getDay())+cells+'</div>'+
+    '<p class="note num" id="cc-sum">'+monthSum(it, mk)+'</p>'+
+    '<p class="note">Tap a day to pick it, then count or enter the number for that day above.</p></div>';
+}
+function paintCounter(){
+  const it = item(S.sel); if(!it || !$("#tap")) return;
+  const n = getCount(S.view, it.id), nb = beadCount(it), unit = it.unit || "times";
+  const malaTap = S.cfg.tapMode === "mala", MS = S.cfg.malaSize;
+  const inRound = malaTap ? Math.round(Math.min(1, n/it.target)*nb) : (n === 0 ? 0 : (n % nb === 0 ? nb : n % nb));
+  document.querySelectorAll(".mala .bead").forEach((b,i) => { b.classList.toggle("on", i < inRound); b.classList.toggle("cur", i === inRound - 1); });
+  $("#c-n").textContent = nf(n);
+  $("#c-of").textContent = "of " + nf(it.target);
+  const full = n >= it.target, isT = S.view === todayKey();
+  $("#tap").classList.toggle("full", full);
+  const ring = $("#tapring"); if(ring){ ring.style.setProperty("--p", Math.min(100, n/it.target*100).toFixed(1)); ring.classList.toggle("full", full); }
+  $("#c-hint").textContent = full ? "Target reached" : (malaTap ? "Tap after each mala · +"+MS : "Tap to count");
+  const rounds = Math.floor(n/MS);
+  $("#c-meta").textContent = full ? (n > it.target ? nf(n - it.target)+" beyond the target" : "Done for "+(isT?"today":"this day"))
+    : (malaTap ? Math.ceil((it.target - n)/MS)+" more mala"+(Math.ceil((it.target - n)/MS)>1?"s":"")+" ("+nf(it.target - n)+") to go" : nf(it.target - n)+" "+unit+" to go")
+      + (rounds ? " · "+rounds+" mala"+(rounds>1?"s":"")+" done" : "");
+  const db = $("#c-done");
+  if(db){ db.disabled = full; db.innerHTML = full ? "&#10003; Done for "+(isT?"today":"this day") : "&#10003; Mark "+(isT?"today's":"this day's")+" japa done · "+nf(it.target); }
+  const cell = document.querySelector('.jcal [data-cday="'+S.view+'"]');
+  if(cell){ cell.outerHTML = calCell(it, S.view); const sm = $("#cc-sum"); if(sm) sm.textContent = monthSum(it, S.view.slice(0,7)); }
+}
+function bump(delta){
+  const it = item(S.sel); if(!it) return;
+  const before = getCount(S.view, it.id), after = Math.max(0, before + delta);
+  setCount(S.view, it.id, after);
+  paintCounter();
+  if(before < it.target && after >= it.target){ haptic("done"); renderCountChips(); postReminders(); celebrate(it.name); }
+  else if(delta > 0){ haptic("tap"); }
+}
+function renderCountChips(){
+  document.querySelectorAll(".pick button").forEach(b => {
+    const i = item(b.dataset.sel); if(!i) return;
+    b.innerHTML = esc(i.name) + (isDone(i,S.view) ? '<span class="ok">&#10003;</span>' : "");
+  });
+}
+
+/* ---------- appearance ---------- */
+const darkQuery = window.matchMedia ? matchMedia("(prefers-color-scheme: dark)") : null;
+function applyTheme(){
+  const r = document.documentElement, c = S.cfg;
+  const dark = c.mode === "dark" || (c.mode === "auto" && darkQuery && darkQuery.matches);
+  r.dataset.palette = c.palette;
+  if(dark) r.setAttribute("data-dark",""); else r.removeAttribute("data-dark");
+  const bg = getComputedStyle(r).getPropertyValue("--sky").trim();
+  const meta = document.getElementById("meta-theme"); if(meta && bg) meta.setAttribute("content", bg);
+  /* status bar text colour in the phone apps */
+  try{
+    const SB = PL.SystemBars || PL.StatusBar;
+    if(IS_MOBILE_APP && SB && SB.setStyle){ const p = SB.setStyle({style: dark ? "DARK" : "LIGHT"}); if(p && p.catch) p.catch(() => {}); }
+  }catch(e){}
+}
+if(darkQuery){ const onScheme = () => { if(S.cfg.mode === "auto") applyTheme(); };
+  if(darkQuery.addEventListener) darkQuery.addEventListener("change", onScheme); else if(darkQuery.addListener) darkQuery.addListener(onScheme); }
+function swatchBg(p){
+  const g = {ushas:["#FBD38D","#F08A4B","#B23A48"], sandhya:["#F6A96B","#9B4F96","#2E2F72"], tulsi:["#D5E8A8","#5FA06F","#1F5B47"], kamala:["#FFD1C2","#E2779F","#7E2A62"]}[p];
+  return "linear-gradient(160deg,"+g[0]+","+g[1]+" 55%,"+g[2]+")";
+}
+function appearanceHtml(){
+  const c = S.cfg;
+  return '<div class="eyebrow">Appearance</div>'+
+    '<div class="swatches" role="group" aria-label="Colour theme">'+Object.keys(PALETTES).map(p => '<button class="swatch" data-pal="'+p+'" aria-pressed="'+(c.palette===p)+'"><i style="background:'+swatchBg(p)+'"></i>'+PALETTES[p]+'</button>').join("")+'</div>'+
+    '<div class="modes" role="group" aria-label="Light or dark" style="grid-template-columns:repeat(3,1fr)">'+[["auto","Auto"],["light","Light"],["dark","Dark"]].map(([v,l]) => '<button data-mode="'+v+'" aria-pressed="'+(c.mode===v)+'">'+l+'</button>').join("")+'</div>';
+}
+
+/* overview */
+function renderOverview(){
+  const tk = todayKey(), japas = S.cfg.items.filter(i => i.kind === "japa");
+  const keys = allKeys();
+  const total = id => keys.reduce((a,k) => a + getCount(k,id), 0);
+  const last7 = Array.from({length:7},(_,i) => ymd(addDays(new Date(), i-6)));
+  const sandhya = S.cfg.items.filter(i => i.group === "sandhya" && !i.off);
+  const todayJapa = japas.reduce((a,i) => a + getCount(tk,i.id), 0);
+  const gayatriAll = sandhya.reduce((a,i) => a + total(i.id), 0);
+  const nf9 = nineFridays().length;
+  const frac = dayFraction(tk);
+  let h = '<div class="tiles">'+
+    '<div class="tile"><b class="num">'+nf(todayJapa)+'</b><span>repetitions counted today</span></div>'+
+    '<div class="tile"><b class="num">'+frac.done+' / '+frac.total+'</b><span>of today\'s items done</span></div>'+
+    (sandhya.length ? '<div class="tile"><b class="num">'+nf(sandhyaStreak())+'</b><span>day streak, every sandhya done</span></div>'+
+    '<div class="tile"><b class="num">'+nf(gayatriAll)+'</b><span>Gayatri japa, all time</span></div>' : "")+'</div>';
+  if(sandhya.length) h += '<div class="card"><div class="eyebrow">Sandhyavandana, last 7 days</div><div class="week"><div></div>'+last7.map(k => '<div class="h">'+DOW[parseYmd(k).getDay()]+'<br><span class="num">'+parseYmd(k).getDate()+'</span></div>').join("");
+  if(sandhya.length) sandhya.forEach(it => { h += '<div class="l">'+esc(it.name.replace(" Sandhya",""))+'</div>'+last7.map(k => { const n = getCount(k,it.id), p = Math.min(100, Math.round(n/it.target*100)); return '<div class="dot '+(p>=100?"full":"")+'" style="--p:'+p+'" title="'+n+' of '+it.target+'"></div>'; }).join(""); });
+  if(sandhya.length) h += '</div><p class="note">Green is the full count. A partly filled circle shows how far you got.</p></div>';
+  /* month calendar */
+  const base = S.cal ? parseYmd(S.cal+"-01") : new Date(); const y = base.getFullYear(), m = base.getMonth();
+  const first = new Date(y,m,1), nDays = new Date(y,m+1,0).getDate();
+  const isCurMonth = ymd(first).slice(0,7) === tk.slice(0,7);
+  h += '<div class="card"><div class="row" style="justify-content:space-between;align-items:center"><button class="ibtn" id="cal-prev" aria-label="Previous month">&#8249;</button><h2 style="font-size:20px">'+first.toLocaleDateString("en-IN",{month:"long",year:"numeric"})+'</h2><button class="ibtn" id="cal-next" aria-label="Next month" '+(isCurMonth?"disabled":"")+'>&#8250;</button></div><div class="cal">'+["S","M","T","W","T","F","S"].map(x => '<div class="h">'+x+'</div>').join("")+"<div></div>".repeat(first.getDay());
+  for(let dd=1; dd<=nDays; dd++){
+    const k = y+"-"+pad(m+1)+"-"+pad(dd), fr = dayFraction(k), fut = k > tk;
+    h += '<button data-day="'+k+'" class="num '+(fr.total && fr.f>=1?"full":"")+(k===tk?" today":"")+'" style="--f:'+fr.f.toFixed(2)+'" '+(fut?"disabled":"")+' aria-label="'+k+', '+fr.done+' of '+fr.total+' done">'+dd+'</button>';
+  }
+  h += '</div><p class="note">Darker means more of that day\'s list was done. Tap a day to open it and fill in what you did.</p></div>';
+  if(S.cfg.items.some(i => i.nine && !i.off)){
+    h += '<div class="card"><div class="eyebrow">Friday Lakshmi pooja, 9 weeks</div><div class="lamps">'+Array.from({length:9},(_,i) => '<div class="lamp '+(i<nf9?"on":"")+'">'+(i+1)+'</div>').join("")+'</div><p class="note">'+Math.min(9,nf9)+' of 9 Fridays completed.</p></div>';
+  }
+  h += '<div class="card"><div class="eyebrow">All japas</div><div class="tblwrap"><table><thead><tr><th>Japa</th><th>Today</th><th>7 days</th><th>All time</th></tr></thead><tbody>'+
+    japas.map(i => '<tr><td>'+esc(i.name)+'</td><td class="num">'+nf(getCount(tk,i.id))+'</td><td class="num">'+nf(last7.reduce((a,k) => a+getCount(k,i.id),0))+'</td><td class="num">'+nf(total(i.id))+'</td></tr>').join("")+
+    '</tbody></table></div></div>';
+  $("#v-overview").innerHTML = h;
+}
+
+/* learn: Rudram and Chamakam anuvaka by anuvaka, plus stotras and songs */
+const LEARN = [
+  {k:"r", name:"Sri Rudram (Namakam)", n:11, url:"https://www.youtube.com/playlist?list=PLyseLtI-fnf_8Z6pqkkmPJcgPoLd8AREm", src:"Learn Sri Rudram (Namakam), Bhaskara Prakasha Ashram, 19 classes"},
+  {k:"c", name:"Chamakam", n:11, url:"https://www.youtube.com/playlist?list=PLyseLtI-fnf_7O7FQc5vDNtKQ8Ny8dmxP", src:"Learn Rudram & Chamakam, Bhaskara Prakasha Ashram, 30 classes"}
+];
+const ST = ["Not started","Learning","Learnt"];
+const okUrl = u => /^https:\/\/[^\s"'<>]+$/.test(u || "");
+function lrn(id){ const L = S.cfg.learn || (S.cfg.learn = {}); return L[id] || (L[id] = {st:0, n:0, url:""}); }
+const isTrack = id => id[0] === "t";
+function idsOf(id){
+  if(isTrack(id)) return S.cfg.tracks.map(t => t.id);
+  const set = LEARN.find(x => x.k === id[0]); return Array.from({length:set.n},(_,i) => set.k+(i+1));
+}
+function titleOf(id){
+  if(isTrack(id)){ const t = S.cfg.tracks.find(x => x.id === id); return t ? t.name : ""; }
+  return LEARN.find(x => x.k === id[0]).name + ", Anuvaka " + id.slice(1);
+}
+/* audio the user attached, kept in this device's browser storage */
+let adb = null; const clipUrls = {};
+function audioDb(){
+  return new Promise((res,rej) => {
+    if(adb) return res(adb);
+    try{ const r = indexedDB.open("sandhya-japa-audio",1);
+      r.onupgradeneeded = () => r.result.createObjectStore("clips");
+      r.onsuccess = () => { adb = r.result; res(adb); }; r.onerror = () => rej(r.error);
+    }catch(e){ rej(e); }
+  });
+}
+async function clipOp(mode, fn){
+  const db = await audioDb();
+  return new Promise((res,rej) => { const rq = fn(db.transaction("clips",mode).objectStore("clips")); rq.onsuccess = () => res(rq.result); rq.onerror = () => rej(rq.error); });
+}
+function dropClipUrl(id){ if(clipUrls[id]){ URL.revokeObjectURL(clipUrls[id]); delete clipUrls[id]; } }
+function playId(id){
+  const url = clipUrls[id], a = $("#p-audio"); if(!url) return false;
+  S.playing = id; a.src = url;
+  const rate = parseFloat($("#p-speed").value) || 1; a.defaultPlaybackRate = rate; a.playbackRate = rate;
+  $("#p-title").textContent = titleOf(id); $("#player").hidden = false; document.body.classList.add("playing");
+  const pr = a.play(); if(pr && pr.catch) pr.catch(() => {});
+  return true;
+}
+function stopPlayer(){
+  const a = $("#p-audio"); a.pause(); a.removeAttribute("src"); a.load();
+  S.playing = null; $("#player").hidden = true; document.body.classList.remove("playing");
+}
+$("#p-audio").addEventListener("ended", () => {
+  const a = $("#p-audio"), cur = S.playing; if(!cur) return;
+  if($("#p-loop").checked){ a.currentTime = 0; const pr = a.play(); if(pr && pr.catch) pr.catch(() => {}); return; }
+  const ids = idsOf(cur), next = ids.slice(ids.indexOf(cur)+1).find(x => clipUrls[x]);
+  if(next){ playId(next); if(VIEW === "learn"){ S.learnOpen = next; renderLearn(); } } else stopPlayer();
+});
+function rowHtml(id, label, fallbackUrl){
+  const a = lrn(id), link = okUrl(a.url) ? a.url : fallbackUrl, has = !!clipUrls[id], track = isTrack(id);
+  return '<details class="an" data-an="'+id+'" '+(S.learnOpen===id?"open":"")+'><summary><span>'+(has?'<span aria-hidden="true">&#9654; </span>':"")+esc(label)+'</span><span class="muted num">'+(a.n?nf(a.n)+" times":"")+'</span><span class="st s'+a.st+'">'+ST[a.st]+'</span></summary><div class="body">'+
+    '<div class="seg" role="group" aria-label="Status">'+ST.map((t,x) => '<button class="btn" data-st="'+id+'" data-v="'+x+'" aria-pressed="'+(a.st===x)+'">'+t+'</button>').join("")+'</div>'+
+    '<div class="row">'+(has?'<button class="btn pri" data-play="'+id+'">Play from here</button>':"")+'<button class="btn" data-prac="'+id+'">I chanted it once (+1)</button><button class="btn" data-unprac="'+id+'">Undo 1</button>'+(link?'<a class="btn" href="'+esc(link)+'" target="_blank" rel="noopener">Open on YouTube</a>':"")+'</div>'+
+    (track ? '<label class="f" for="n-'+id+'">Name<input class="field" id="n-'+id+'" data-tname="'+id+'" maxlength="80" value="'+esc(label)+'"></label>' : "")+
+    '<label class="f" for="l-'+id+'">YouTube link<small>Paste a video link and the Open on YouTube button goes straight to it.</small><input class="field" type="url" id="l-'+id+'" data-link="'+id+'" placeholder="https://www.youtube.com/watch?v=..." value="'+esc(a.url||"")+'"></label>'+
+    (has ? '<div class="row" style="align-items:center"><span class="muted">Audio attached. Opening this row plays it.</span><button class="btn warn" data-rmclip="'+id+'">Remove audio</button></div>'
+         : '<label class="f" for="f-'+id+'">Audio file<small>Pick an audio file saved on this device. Once attached, opening this row plays it and then carries on to the next one. It stays on this device only.</small><input class="field" type="file" accept="audio/*" id="f-'+id+'" data-clip="'+id+'"></label>')+
+    (track ? '<div class="row"><button class="btn warn" data-deltrack="'+id+'">Delete from list</button></div>' : "")+
+    '<p class="note" id="m-'+id+'" role="status"></p></div></details>';
+}
+function renderLearn(){
+  let h = "";
+  LEARN.forEach(set => {
+    const ids = idsOf(set.k+"1"), learnt = ids.filter(id => lrn(id).st === 2).length;
+    h += '<div class="card"><div class="lh"><h2>'+set.name+'</h2><span class="muted num">'+learnt+' of '+set.n+' learnt</span></div>'+
+      '<div class="daysum"><div class="bar"><b style="width:'+Math.round(learnt/set.n*100)+'%"></b></div></div>'+
+      '<p class="note">'+esc(set.src)+'</p><div class="row" style="margin:10px 0 6px"><a class="btn pri" href="'+set.url+'" target="_blank" rel="noopener">Open the class playlist on YouTube</a></div>'+
+      ids.map((id,i) => rowHtml(id, "Anuvaka "+(i+1), set.url)).join("")+'</div>';
+  });
+  h += '<div class="card"><div class="lh"><h2>Stotras and devotional songs</h2><span class="muted num">'+S.cfg.tracks.length+' in list</span></div>'+
+    '<p class="note">Attach your audio to each one. They play in this order, one after another.</p>'+
+    S.cfg.tracks.map(t => rowHtml(t.id, t.name, "")).join("")+
+    '<div class="tadd"><input class="field" id="t-new" maxlength="80" placeholder="Name of a stotra or song" aria-label="Name of a stotra or song"><button class="btn pri" id="t-add">Add</button></div></div>';
+  $("#v-learn").innerHTML = h;
+}
+document.addEventListener("toggle", e => {
+  const d = e.target; if(!d.dataset || !d.dataset.an) return;
+  if(d.open){ S.learnOpen = d.dataset.an; document.querySelectorAll("details.an[open]").forEach(o => { if(o !== d) o.open = false; }); }
+  else if(S.learnOpen === d.dataset.an) S.learnOpen = null;
+}, true);
+/* opening a row that has audio starts it straight away */
+document.addEventListener("click", e => {
+  const sm = e.target.closest("details.an > summary"); if(!sm) return;
+  const d = sm.parentElement, id = d.dataset.an;
+  if(!d.open && clipUrls[id] && S.playing !== id) playId(id);
+});
+
+/* japas + settings */
+function groupOf(it){
+  if(it.custom) return "own"; if(it.group === "sandhya") return "sandhya";
+  if(it.when === "once") return "once"; if(it.when === "born") return "born";
+  return it.days.length === 7 ? "daily" : "fri";
+}
+function renderJapas(){
+  const groups = [["sandhya","Sandhyavandana, every day"],["daily","Every day"],["fri","On some days"],["born","Born day"],["once","One time"],["own","Added by you"]];
+  let h = '<button class="btn pri big" id="add-japa">+ Add a japa, mantra or task</button>';
+  if(!S.cfg.items.length) h += '<div class="card empty"><div class="big-om" aria-hidden="true">ॐ</div><p>Your list is empty. Add a japa with its count and mantra, or bring back Gayatri japa below.</p></div>';
+  groups.forEach(([g,title]) => {
+    const list = S.cfg.items.filter(i => groupOf(i) === g); if(!list.length) return;
+    h += '<div class="card"><div class="eyebrow">'+title+'</div><ul class="jl">'+list.map(i =>
+      '<li class="'+(i.off?"off":"")+'"><div><b>'+esc(i.name)+'</b><p>'+(i.kind==="japa" ? nf(i.target)+" "+esc(i.unit||"times") : "Tick off")+' · '+esc(scheduleText(i))+(i.detail?' · '+esc(i.detail):"")+(i.off?" · switched off":"")+'</p></div><div class="row"><button class="btn" data-edit="'+esc(i.id)+'">Edit</button><button class="btn warn" data-del="'+esc(i.id)+'">Delete</button></div></li>').join("")+'</ul></div>';
+  });
+  const c = S.cfg;
+  h += '<div class="card stack">'+appearanceHtml()+'</div>';
+  h += '<div class="card stack"><div class="eyebrow">Settings</div>'+
+    '<label class="f" for="set-place">Place for sunrise and sunset<select class="field" id="set-place"><option value="blr">Bengaluru</option><option value="mys">Mysuru</option><option value="custom">Other (enter latitude and longitude)</option></select></label>'+
+    '<div class="row" id="set-ll" '+(c.place==="custom"?"":"hidden")+'><label class="f" for="set-lat" style="flex:1">Latitude<input class="field" id="set-lat" type="number" step="0.0001" value="'+c.lat+'"></label><label class="f" for="set-lon" style="flex:1">Longitude (east)<input class="field" id="set-lon" type="number" step="0.0001" value="'+c.lon+'"></label></div>'+
+    (S.cfg.items.some(i => i.when === "born") ? '<label class="f" for="set-born">What "born day" means<select class="field" id="set-born"><option value="weekday">Every Saturday</option><option value="birthday">Once a year, on your birthday</option></select></label>' : "")+
+    (S.cfg.items.some(i => i.nine) ? '<label class="f" for="set-nine">First Friday of the 9-week pooja<input class="field" id="set-nine" type="date" value="'+esc(c.nineStart)+'"></label>' : "")+
+    '<div class="row"><button class="btn" id="restore-list">Bring back Gayatri japa</button><span class="note">Puts Pratah and Sayam Gayatri back if you deleted them. Your own japas and all counts are kept.</span></div>'+
+    (CAN_REMIND ? '<label class="inl" for="set-remind"><input type="checkbox" id="set-remind" '+(c.remind===false?"":"checked")+'> Remind me before Pratah and Sayam sandhya</label><span class="note" id="remind-msg" role="status">'+(PLATFORM==="desktop"?"Reminders show while the app is open.":"")+'</span>'
+      : '<p class="note">Reminders work in the installed Android, iPhone and desktop apps.</p>')+
+    '<div class="eyebrow">Backup and moving to another device</div>'+
+    '<div class="row"><button class="btn" id="copy-backup">Copy a backup of my data</button>'+(IS_MOBILE_APP?"":'<button class="btn" id="save-backup">Save backup file</button>')+'<button class="btn" id="restore-backup">Restore from a backup</button></div>'+
+    '<span class="note" id="copy-msg" role="status"></span></div>';
+  $("#v-japas").innerHTML = h;
+  $("#set-place").value = c.place; if($("#set-born")) $("#set-born").value = c.bornMode;
+}
+
+function openEditor(id){
+  const isNew = !id, it = isNew ? {kind:"japa", name:"", detail:"", target:108, days:ALL.slice(), slot:"morning", mantra:"", custom:true, when:"days"} : item(id);
+  const f = $("#dlg-form"); f.dataset.id = id || ""; delete f.dataset.mode;
+  const canSchedule = it.when === "days";
+  f.innerHTML = '<h2>'+(isNew?"Add a japa or task":"Edit "+esc(it.name))+'</h2>'+
+    (isNew ? '<label class="f" for="e-kind">Type<select class="field" id="e-kind"><option value="japa">Counted japa</option><option value="task">Tick-off task</option></select></label>' : "")+
+    '<label class="f" for="e-name">Name<input class="field" id="e-name" required maxlength="60" value="'+esc(it.name)+'"></label>'+
+    '<label class="f" for="e-detail">Short note<input class="field" id="e-detail" maxlength="120" value="'+esc(it.detail||"")+'"></label>'+
+    '<label class="f" id="e-target-w" for="e-target">Daily count<small>Common counts are 10, 28, 54, 108 and 1008.</small><input class="field num" id="e-target" type="number" inputmode="numeric" min="1" max="100000" value="'+it.target+'"></label>'+
+    (canSchedule ? '<div class="f">Days<div class="days">'+DOW.map((n,i) => '<label for="e-d'+i+'"><input type="checkbox" id="e-d'+i+'" value="'+i+'" '+(it.days.includes(i)?"checked":"")+'>'+n+'</label>').join("")+'</div></div>'+
+      '<label class="f" for="e-slot">Time of day<select class="field" id="e-slot"><option value="bath">Early morning</option><option value="sunrise">Before sunrise</option><option value="morning">Morning</option><option value="noon">Midday</option><option value="sunset">Sunset</option><option value="evening">Evening</option><option value="anytime">Any time</option></select></label>' : "")+
+    '<label class="f" id="e-mantra-w" for="e-mantra">Mantra text<textarea class="field" id="e-mantra" rows="5" maxlength="2000">'+esc(it.mantra||"")+'</textarea></label>'+
+    (!isNew ? '<label class="inl" for="e-on"><input type="checkbox" id="e-on" '+(it.off?"":"checked")+'> Include in my list</label>' : "")+
+    '<p class="note" id="e-err" role="alert"></p>'+
+    '<div class="row"><button class="btn pri" type="submit">Save</button><button class="btn" type="button" id="e-cancel">Cancel</button>'+(!isNew ? '<button class="btn warn" type="button" id="e-del">Delete</button>' : "")+'</div>';
+  if(canSchedule) $("#e-slot").value = it.slot || "morning";
+  const syncKind = () => { const k = isNew ? $("#e-kind").value : it.kind; $("#e-target-w").hidden = k !== "japa"; $("#e-mantra-w").hidden = k !== "japa"; };
+  if(isNew) $("#e-kind").addEventListener("change", syncKind);
+  syncKind();
+  $("#dlg").showModal();
+}
+function saveEditor(){
+  const f = $("#dlg-form"), id = f.dataset.id, isNew = !id;
+  const name = $("#e-name").value.trim();
+  if(!name){ $("#e-err").textContent = "Give it a name before saving."; return; }
+  const it = isNew ? {id:"c"+Date.now().toString(36), custom:true, when:"days", kind:$("#e-kind").value} : item(id);
+  it.name = name; it.detail = $("#e-detail").value.trim();
+  it.target = it.kind === "japa" ? Math.max(1, parseInt($("#e-target").value,10) || 1) : 1;
+  if(it.kind === "japa") it.mantra = $("#e-mantra").value.trim();
+  if(it.when === "days"){
+    const days = DOW.map((_,i) => $("#e-d"+i).checked ? i : -1).filter(i => i >= 0);
+    if(!days.length){ $("#e-err").textContent = "Pick at least one day."; return; }
+    it.days = days; it.slot = $("#e-slot").value;
+  }
+  if(!isNew) it.off = !$("#e-on").checked; else S.cfg.items.push(it);
+  touchCfg(); $("#dlg").close(); render();
+}
+
+/* restore: paste a backup, or pick a backup file */
+function openRestore(){
+  const f = $("#dlg-form"); f.dataset.mode = "restore";
+  f.innerHTML = '<h2>Restore from a backup</h2>'+
+    '<p class="note" style="margin:0">This replaces everything in the app on this device with the backup: your list, counts, learning progress and settings. Audio files are not part of a backup.</p>'+
+    '<label class="f" for="r-file">Backup file<input class="field" type="file" id="r-file" accept=".json,application/json,text/plain"></label>'+
+    '<label class="f" for="r-text">Or paste the backup text<textarea class="field" id="r-text" rows="6"></textarea></label>'+
+    '<p class="note" id="r-err" role="alert"></p>'+
+    '<div class="row"><button class="btn pri" type="submit">Restore</button><button class="btn" type="button" id="r-cancel">Cancel</button></div>';
+  $("#dlg").showModal();
+}
+function parseBackup(txt){
+  const o = JSON.parse(txt);
+  if(!o || typeof o !== "object" || !o.cfg || typeof o.months !== "object" || !Array.isArray(o.cfg.items)) throw new Error("shape");
+  return o;
+}
+function doRestore(){
+  const txt = $("#r-text").value.trim();
+  if(!txt){ $("#r-err").textContent = "Pick a backup file or paste the backup text first."; return; }
+  let o; try{ o = parseBackup(txt); }catch(e){ $("#r-err").textContent = "That is not a Sandhya Japa backup. Copy it again from the other device."; return; }
+  S.cfg = normCfg(o.cfg); S.cfg.t = Date.now(); S.months = o.months || {}; applyTheme();
+  for(const mk in S.months) dirty.add(mk);
+  markDirty("config"); postReminders();
+  $("#dlg").close(); render();
+}
+
+function render(){
+  renderDatebar();
+  if(VIEW === "today") renderToday();
+  else if(VIEW === "count") renderCount();
+  else if(VIEW === "overview") renderOverview();
+  else if(VIEW === "learn") renderLearn();
+  else renderJapas();
+}
+/* ---------- little celebrations ---------- */
+const calm = () => window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+function tapFx(d){
+  if(calm()) return;
+  const m = document.querySelector(".mala"); if(!m) return;
+  const r = document.createElement("span"); r.className = "ripple"; m.appendChild(r); r.addEventListener("animationend", () => r.remove());
+  const p = document.createElement("span"); p.className = "plus num"; p.textContent = "+" + nf(d); m.appendChild(p); p.addEventListener("animationend", () => p.remove());
+  const n = $("#c-n"); if(n){ n.classList.remove("bump"); void n.offsetWidth; n.classList.add("bump"); }
+  const it = item(S.sel); if(!it) return;
+  const c = getCount(S.view, it.id), size = S.cfg.tapMode === "mala" ? S.cfg.malaSize : beadCount(it);
+  if(c > 0 && c < it.target && c % size === 0 && size > 1){
+    const b = document.createElement("span"); b.className = "burst"; m.appendChild(b); b.addEventListener("animationend", () => b.remove());
+    const g = document.createElement("span"); g.className = "roundtag num"; g.textContent = "Mala " + (c/size) + " ✓"; m.appendChild(g); g.addEventListener("animationend", () => g.remove());
+    haptic("done");
+  }
+}
+function shineRow(kind, id){
+  if(calm()) return;
+  const b = document.querySelector('[data-'+kind+'="'+id+'"]'), li = b && b.closest("li"); if(li) li.classList.add("shine");
+}
+function startSparks(){
+  const box = document.querySelector(".sparks"); if(!box || calm()) return;
+  for(let i=0;i<14;i++){
+    const e = document.createElement("i");
+    e.style.left = (Math.random()*100)+"%"; e.style.setProperty("--sx", (Math.random()*80-40)+"px");
+    e.style.animationDuration = (14 + Math.random()*12)+"s"; e.style.animationDelay = (-Math.random()*20)+"s";
+    const sz = 3 + Math.random()*4; e.style.width = e.style.height = sz+"px";
+    box.appendChild(e);
+  }
+}
+function endIntro(){
+  const el = document.getElementById("intro"); if(!el) return;
+  if(calm()){ el.remove(); return; }
+  setTimeout(() => { el.classList.add("done"); setTimeout(() => el.remove(), 600); }, 1500);
+}
+function celebrate(name){
+  document.querySelectorAll(".toast,.petals").forEach(x => x.remove());
+  const t = document.createElement("div"); t.className = "toast"; t.setAttribute("role","status");
+  t.innerHTML = '<b aria-hidden="true">ॐ</b><span><strong>Sampoornam</strong><small>'+esc(name)+' complete</small></span>';
+  document.body.appendChild(t); setTimeout(() => t.remove(), 3000);
+  if(calm()) return;
+  const box = document.createElement("div"); box.className = "petals"; box.setAttribute("aria-hidden","true");
+  const colors = ["#F59E0B","#EA580C","#FBBF24","#E11D48","#FB7185","#FFF7E6","#F97316"];
+  for(let i=0;i<42;i++){
+    const e = document.createElement("i"); e.className = "petal";
+    e.style.left = (Math.random()*100)+"vw"; e.style.background = colors[i % colors.length];
+    e.style.animationDuration = (2.2 + Math.random()*1.8)+"s"; e.style.animationDelay = (Math.random()*0.7)+"s";
+    e.style.setProperty("--dx", (Math.random()*120-60)+"px"); e.style.setProperty("--rot", (Math.random()*720-360)+"deg");
+    box.appendChild(e);
+  }
+  document.body.appendChild(box); setTimeout(() => box.remove(), 4800);
+}
+function go(v){
+  VIEW = ["today","count","learn","overview","japas"].includes(v) ? v : "today";
+  ["today","count","learn","overview","japas"].forEach(x => { $("#v-"+x).hidden = x !== VIEW; });
+  document.querySelectorAll("nav.tabs a").forEach(a => { if(a.dataset.v === VIEW) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
+  render(); window.scrollTo(0,0);
+  const sec = $("#v-"+VIEW); sec.classList.remove("enter"); void sec.offsetWidth; sec.classList.add("enter");
+  clearTimeout(go.t); go.t = setTimeout(() => sec.classList.remove("enter"), 900);
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e => {
+  const t = e.target.closest("button"); if(!t) return;
+  const ds = t.dataset;
+  if(t.id === "d-prev"){ S.view = ymd(addDays(parseYmd(S.view),-1)); S.ccal = null; render(); }
+  else if(t.id === "d-next"){ if(S.view < todayKey()){ S.view = ymd(addDays(parseYmd(S.view),1)); S.ccal = null; render(); } }
+  else if(t.id === "d-today"){ S.view = todayKey(); S.ccal = null; render(); }
+  else if(ds.full){
+    const it = item(ds.full); if(!it) return;
+    if(!isDone(it,S.view)){ setCount(S.view, it.id, it.target); haptic("done"); postReminders(); render(); shineRow("full", it.id); celebrate(it.name); }
+    else if(ds.arm){ setCount(S.view, it.id, 0); render(); }
+    else { ds.arm = "1"; t.classList.add("arm"); t.innerHTML = "&#215;"; t.setAttribute("aria-label","Tap again to clear "+it.name);
+      setTimeout(() => { if(t.isConnected){ delete t.dataset.arm; t.classList.remove("arm"); t.innerHTML = "&#10003;"; } }, 3000); }
+  }
+  else if(t.id === "c-done"){ const it = item(S.sel); if(it){ const n = getCount(S.view,it.id); if(n < it.target) bump(it.target - n); } }
+  else if(ds.cday){ S.view = ds.cday; S.ccal = null; render(); }
+  else if(t.id === "cc-prev" || t.id === "cc-next"){
+    const b = parseYmd((S.ccal || S.view.slice(0,7))+"-01");
+    S.ccal = ymd(new Date(b.getFullYear(), b.getMonth() + (t.id === "cc-prev" ? -1 : 1), 1)).slice(0,7); renderCount();
+  }
+  else if(ds.pal){ S.cfg.palette = ds.pal; touchCfg(); applyTheme(); renderJapas(); }
+  else if(ds.mode && t.closest(".modes")){ S.cfg.mode = ds.mode; touchCfg(); applyTheme(); renderJapas(); }
+  else if(ds.toggle){
+    const it = item(ds.toggle), on = !isDone(it,S.view);
+    setCount(S.view, it.id, on ? 1 : 0);
+    if(it.when === "once"){ if(on) S.cfg.once[it.id] = S.view; else delete S.cfg.once[it.id]; touchCfg(); }
+    render(); if(on){ haptic("done"); shineRow("toggle", it.id); }
+  }
+  else if(ds.open){ S.sel = ds.open; location.hash = "count"; if(VIEW === "count") render(); }
+  else if(ds.sel){ S.sel = ds.sel; renderCount(); }
+  else if(t.id === "tap"){ const d = S.cfg.tapMode === "mala" ? S.cfg.malaSize : 1; bump(d); tapFx(d); }
+  else if(t.id === "c-undo"){ bump(S.cfg.tapMode === "mala" ? -S.cfg.malaSize : -1); renderCountChips(); }
+  else if(ds.tap){ S.cfg.tapMode = ds.tap; touchCfg(); renderCount(); }
+  else if(t.id === "c-reset"){
+    if(t.dataset.arm){ setCount(S.view, S.sel, 0); renderCount(); }
+    else { t.dataset.arm = "1"; t.textContent = "Tap again to reset"; setTimeout(() => { if(t.isConnected){ delete t.dataset.arm; t.textContent = "Reset to 0"; } }, 3000); }
+  }
+  else if(ds.add){ bump(parseInt(ds.add,10)); renderCountChips(); }
+  else if(t.id === "batch-add" || t.id === "batch-set"){
+    const v = parseInt($("#batch-n").value,10);
+    if(!(v >= 0)) { $("#batch-n").focus(); return; }
+    if(t.id === "batch-add") bump(v); else { setCount(S.view, S.sel, v); paintCounter(); }
+    $("#batch-n").value = ""; renderCountChips();
+  }
+  else if(ds.day){ S.view = ds.day; S.ccal = null; location.hash = "today"; }
+  else if(t.id === "cal-prev" || t.id === "cal-next"){
+    const b = S.cal ? parseYmd(S.cal+"-01") : new Date();
+    S.cal = ymd(new Date(b.getFullYear(), b.getMonth() + (t.id === "cal-prev" ? -1 : 1), 1)).slice(0,7); renderOverview();
+  }
+  else if(ds.st){ lrn(ds.st).st = parseInt(ds.v,10) || 0; touchCfg(); renderLearn(); }
+  else if(ds.prac){ const a = lrn(ds.prac); a.n = (a.n||0) + 1; if(a.st === 0) a.st = 1; touchCfg(); haptic("tap"); renderLearn(); }
+  else if(ds.unprac){ const a = lrn(ds.unprac); a.n = Math.max(0,(a.n||0) - 1); touchCfg(); renderLearn(); }
+  else if(ds.play){ playId(ds.play); }
+  else if(t.id === "p-close"){ stopPlayer(); }
+  else if(ds.rmclip){
+    if(ds.arm){ const id = ds.rmclip; if(S.playing === id) stopPlayer(); dropClipUrl(id); clipOp("readwrite", st => st.delete(id)).catch(() => {}); renderLearn(); }
+    else { ds.arm = "1"; t.textContent = "Tap again to remove"; }
+  }
+  else if(t.id === "t-add"){
+    const name = $("#t-new").value.trim(); if(!name){ $("#t-new").focus(); return; }
+    const id = "t-"+Date.now().toString(36); S.cfg.tracks.push({id, name}); S.learnOpen = id; touchCfg(); renderLearn();
+  }
+  else if(ds.deltrack){
+    if(ds.arm){ const id = ds.deltrack; if(S.playing === id) stopPlayer(); dropClipUrl(id); clipOp("readwrite", st => st.delete(id)).catch(() => {});
+      S.cfg.tracks = S.cfg.tracks.filter(x => x.id !== id); delete S.cfg.learn[id]; touchCfg(); renderLearn(); }
+    else { ds.arm = "1"; t.textContent = "Tap again to delete"; }
+  }
+  else if(ds.edit){ openEditor(ds.edit); }
+  else if(ds.del){
+    if(ds.arm){ S.cfg.items = S.cfg.items.filter(i => i.id !== ds.del); touchCfg(); render(); }
+    else { ds.arm = "1"; t.textContent = "Tap again to delete"; setTimeout(() => { if(t.isConnected){ delete t.dataset.arm; t.textContent = "Delete"; } }, 3000); }
+  }
+  else if(t.id === "restore-list"){
+    if(ds.arm){ const have = new Set(S.cfg.items.map(i => i.id)); S.cfg.items = clone(DEFAULT_ITEMS).filter(i => !have.has(i.id)).concat(S.cfg.items); touchCfg(); render(); }
+    else { ds.arm = "1"; t.textContent = "Tap again to bring it back"; }
+  }
+  else if(t.id === "add-japa"){ openEditor(null); }
+  else if(t.id === "e-cancel"){ $("#dlg").close(); }
+  else if(t.id === "e-del"){
+    if(t.dataset.arm){ S.cfg.items = S.cfg.items.filter(i => i.id !== $("#dlg-form").dataset.id); touchCfg(); $("#dlg").close(); render(); }
+    else { t.dataset.arm = "1"; t.textContent = "Tap again to delete"; }
+  }
+  else if(t.id === "copy-backup"){
+    const txt = JSON.stringify({cfg:S.cfg, months:S.months});
+    (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(
+      () => { $("#copy-msg").textContent = "Copied. Paste it somewhere safe."; },
+      () => { $("#copy-msg").textContent = "Copying was blocked in this view."; });
+  }
+  else if(t.id === "save-backup"){
+    const blob = new Blob([JSON.stringify({cfg:S.cfg, months:S.months}, null, 1)], {type:"application/json"});
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "sandhya-japa-backup-"+todayKey()+".json";
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    $("#copy-msg").textContent = "Backup file saved to your downloads.";
+  }
+  else if(t.id === "restore-backup"){ openRestore(); }
+  else if(t.id === "r-cancel"){ $("#dlg").close(); }
+});
+document.addEventListener("change", e => {
+  const t = e.target, c = S.cfg;
+  if(t.dataset.link){
+    const v = t.value.trim(), msg = document.getElementById("m-"+t.dataset.link);
+    if(v && !okUrl(v)){ msg.textContent = "That does not look like a link. It should start with https://"; return; }
+    lrn(t.dataset.link).url = v; touchCfg(); renderLearn(); return;
+  }
+  if(t.dataset.clip){
+    const f = t.files && t.files[0], id = t.dataset.clip, msg = document.getElementById("m-"+id); if(!f) return;
+    if(f.size > 80*1024*1024){ msg.textContent = "That file is over 80 MB. Pick a smaller one."; return; }
+    clipOp("readwrite", st => st.put(f, id)).then(() => { dropClipUrl(id); clipUrls[id] = URL.createObjectURL(f); S.learnOpen = id; renderLearn(); },
+      () => { msg.textContent = "This view could not save the audio. Try opening the page in Safari or the app."; });
+    return;
+  }
+  if(t.dataset.tname){
+    const v = t.value.trim(), tr = S.cfg.tracks.find(x => x.id === t.dataset.tname);
+    if(v && tr){ tr.name = v; touchCfg(); renderLearn(); if(S.playing === tr.id) $("#p-title").textContent = v; }
+    return;
+  }
+  if(t.id === "p-speed"){ const a = $("#p-audio"), r = parseFloat(t.value) || 1; a.defaultPlaybackRate = r; a.playbackRate = r; return; }
+  if(t.id === "p-loop") return;
+  if(t.id === "c-malasize"){ c.malaSize = parseInt(t.value,10) || 108; touchCfg(); renderCount(); return; }
+  if(t.id === "r-file"){
+    const f = t.files && t.files[0]; if(!f) return;
+    f.text().then(txt => { $("#r-text").value = txt; $("#r-err").textContent = "File loaded. Tap Restore."; }, () => { $("#r-err").textContent = "Could not read that file."; });
+    return;
+  }
+  if(t.id === "set-remind"){
+    const on = t.checked, msg = $("#remind-msg");
+    if(on){
+      askReminderPermission().then(ok => {
+        if(!ok){ t.checked = false; c.remind = false; msg.textContent = "Notifications are turned off for this app. Allow them in your phone's settings, then switch this on again."; }
+        else { c.remind = true; msg.textContent = "Reminders are on."; }
+        touchCfg();
+      });
+    }else{ c.remind = false; msg.textContent = "Reminders are off."; touchCfg(); }
+    return;
+  }
+  else if(t.id === "set-place"){ c.place = t.value; if(PLACES[t.value]){ c.lat = PLACES[t.value].lat; c.lon = PLACES[t.value].lon; } touchCfg(); renderJapas(); }
+  else if(t.id === "set-lat" || t.id === "set-lon"){
+    const lat = parseFloat($("#set-lat").value), lon = parseFloat($("#set-lon").value);
+    if(lat >= -66 && lat <= 66 && lon >= -180 && lon <= 180){ c.lat = lat; c.lon = lon; touchCfg(); }
+  }
+  else if(t.id === "set-born"){ c.bornMode = t.value; touchCfg(); }
+  else if(t.id === "set-nine"){ if(/^\d{4}-\d\d-\d\d$/.test(t.value)){ c.nineStart = t.value; touchCfg(); } }
+});
+$("#dlg-form").addEventListener("submit", e => { e.preventDefault(); if($("#dlg-form").dataset.mode === "restore") doRestore(); else saveEditor(); });
+/* links to YouTube open in the YouTube app or the system browser, never inside the app window */
+document.addEventListener("click", e => {
+  const a = e.target.closest('a[target="_blank"]'); if(!a) return;
+  if(PLATFORM === "web") return;
+  e.preventDefault(); openExternal(a.href);
+}, true);
+window.addEventListener("hashchange", () => go(location.hash.slice(1)));
+
+/* ---------- boot ---------- */
+loadLocal();
+applyTheme();
+go(location.hash.slice(1) || "today");
+endIntro();
+startSparks();
+initSync();
+loadMirror().then(restored => { if(restored){ applyTheme(); render(); } });
+postReminders();
+/* first launch of the phone app: ask once whether reminders may be shown */
+if(IS_MOBILE_APP && PL.LocalNotifications && S.cfg.remind !== false){
+  PL.LocalNotifications.checkPermissions().then(p => {
+    if(p.display === "granted") return;
+    let asked = false; try{ asked = !!localStorage.getItem(LS_KEY+"-asked"); localStorage.setItem(LS_KEY+"-asked","1"); }catch(e){}
+    if(!asked) askReminderPermission().then(ok => { if(ok) postReminders(); });
+  }).catch(() => {});
+}
+/* website / installed web app: work offline after the first visit */
+if(PLATFORM === "web" && "serviceWorker" in navigator && /^https?:$/.test(location.protocol) && !window.claude){
+  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+}
+(async () => {
+  try{
+    const keys = await clipOp("readonly", st => st.getAllKeys()), blobs = await clipOp("readonly", st => st.getAll());
+    keys.forEach((k,i) => { if(blobs[i]) clipUrls[k] = URL.createObjectURL(blobs[i]); });
+    if(VIEW === "learn") renderLearn();
+  }catch(e){}
+})();
+setInterval(() => { if(VIEW === "today" && !document.hidden && S.view === todayKey()) renderToday(); }, 5*60*1000);
+</script>
+</body>
+</html>

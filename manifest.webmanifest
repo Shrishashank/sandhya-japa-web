@@ -1,0 +1,23 @@
+{
+  "name": "Sandhya Japa Counter",
+  "short_name": "Sandhya Japa",
+  "description": "Daily sandhya and japa schedule, 108-bead counter, Rudram learning and progress.",
+  "id": "./",
+  "start_url": "./#today",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF4EA",
+  "theme_color": "#F08A4B",
+  "lang": "en-IN",
+  "categories": ["lifestyle", "education"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Counter", "url": "./#count", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Learn", "url": "./#learn", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
